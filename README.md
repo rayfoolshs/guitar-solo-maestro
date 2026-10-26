@@ -1,11 +1,57 @@
 # Guitar Solo Maestro
 
-A practice companion for soloing over changes: type a chart, get a scale for every chord,
-see it on a 24-fret neck, and play the progression with piano, bass and drums.
+A practice companion for guitarists who want to solo over chord changes. You give it a
+tune; it tells you **which scale to play over every chord** and shows you **where those
+notes sit on the neck** — then plays the progression back so you can practise against it.
 
-**v0.4.0** · made by Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
+**v0.4.0** · [Play it live](https://rayfoolshs.github.io/guitar-solo-maestro/) · made by
+Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
 
-![](guitar-solo-maestro-screen.jpg)
+![Guitar Solo Maestro](guitar-solo-maestro-screen.jpg)
+
+---
+
+## The core idea
+
+Most practice tools stop at backing tracks. This one pairs the track with the theory: every
+chord gets a ranked chord-scale, labelled with *why* — "G Phrygian dominant · 5th mode of C
+harmonic minor · adds B" — and the fretboard shows the tonic ringed, chord tones in teal and
+passing notes muted.
+
+## What you can do with it
+
+**Enter a chart**
+
+A leadsheet with chords above a stave and scale suggestions beneath. Click any beat to type
+a chord (`B♭maj7`, `F#m7b5`, `C6/9`, `D/F#`), or drag across the chart to set an A–B loop.
+Bars go from 4 to 32; the stepper hides and reveals them without destroying anything. The app
+opens on **Blue Bossa** in C minor — two choruses, three flats on the stave.
+
+**Read the analysis**
+
+- Key detection across all 24 keys, with a confidence score and an overridable key.
+- A scale per chord, ranked by fit, with borrowed-note flags and transition arrows showing
+  how far each scale is from its neighbour.
+- One whole-progression recommendation, plus pentatonic and blues alternatives.
+
+**See it on the neck**
+
+A 24-fret fretboard with true fret spacing — tonic ringed in amber, chord tones teal, other
+scale tones sand, tensions dashed. Degree or note labels, and eight position windows
+(All, 1–5 … 17–24).
+
+**Play it**
+
+A General MIDI soundfont (GeneralUser GS, through Spessasynth's WASM synth) renders piano
+comping, a bass line on the roots with chromatic approaches, and drums for **Jazz Swing**,
+**Rock** or **Bossa Nova** — a real 3-2 son clave for bossa, the six-hit ride for swing, with
+a 0–100 % swing slider. Tempo, count-in, loop, and a compact mixer with per-part volume,
+mutes and a piano octave shifter.
+
+**Print it**
+
+A4 landscape, one page, mirroring the on-screen leadsheet: title block, eight bars per
+system, scale lane under each.
 
 ## Run it
 
@@ -13,73 +59,46 @@ see it on a 24-fret neck, and play the progression with piano, bass and drums.
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # typecheck + production bundle in dist/
-npm test         # theory / arrangement tests
+npm test         # theory / arrangement tests (16)
 ```
 
-## What it does
+## How it's built
 
-**Leadsheet**
-- 32-bar default: **Blue Bossa** in C minor, two choruses, three flats on the stave.
-- Fit view (8 bars per system) or Comfortable (4 bars per system).
-- Click any beat to type a chord; empty slots appear on hover. Enter commits, Escape cancels.
-- `− / +` bar stepper, 4–32 bars. Hidden bars keep their chords.
-- **Drag across the chart to set an A–B loop** — it commits on press and extends live.
-- Chart menu: reset to 4 bars, new chart, load Blue Bossa, clear chords, fit/comfortable.
-- Key auto-detection with confidence, overridable from the Key pill. Charts autosave.
-
-**Theory**
-- Key-aware chord parsing (`B♭maj7`, `F#m7b5`, `C6/9`, `D/F#`; `H7` is reported, not crashed).
-- Chord-scale suggestions per bar with mode-of-parent labels ("5th mode of C harmonic
-  minor"), borrowed-note flags and transition arrows.
-- Whole-progression suggestion plus pentatonic/blues alternatives.
-
-**Fretboard**
-- 24 frets with true geometric spacing, inlays at the standard positions.
-- Tonic ringed in amber, chord tones teal, other scale tones sand, tensions dashed.
-- Degree or note labels; eight position windows.
-
-**Playback**
-- **General MIDI soundfont** — GeneralUser GS played through Spessasynth's WASM synth,
-  with the built-in synth as a fallback.
-- Piano comping (root-position, scale-aware voicings, **OCT −/+** shifter), root-based bass
-  with chromatic approach, style-specific drums:
-  - **Jazz Swing** — six-hit ride (1 · 2 · 2& · 3 · 4 · 4&), hi-hat foot on 2 and 4
-  - **Rock** — kick 1 and 3 (+ the & of 3), snare 2 and 4, closed hats
-  - **Bossa Nova** — 3-2 son clave on the cross-stick, 16th shaker, surdo kick
-- Three styles, tempo 40–220, count-in, loop (visible bars or A–B), swing 0–100 %.
-- Compact mixer rail: three channels with dB sliders, mutes and the piano octave control.
-
-**Print** — A4 landscape, one page, mirroring the on-screen leadsheet.
-
-## Layout
+React + TypeScript on Vite. The musical core — chord parsing, key detection, chord-scale
+ranking, groove generation — is **pure TypeScript with no React and no audio**, covered by
+unit tests. Playback is a lookahead scheduler over Web Audio. Deployed to GitHub Pages from
+a public repo on every push.
 
 ```
 src/
-  theory/     pitch, chords, scales, keys, suggestions, fretboard mapping
-  chart/      chart model, Blue Bossa default, editing helpers
+  theory/     pitch, chords, scales, keys, chord-scale ranking, fretboard mapping
+  chart/      the document: Chart / Bar / ChordSlot, Blue Bossa default
   arrange/    chart + style -> note events (comping, bass, drums, swing)
   audio/      lookahead scheduler, built-in synth, Spessasynth soundfont
   ui/         Header, Leadsheet, Mixer, Fretboard, VersionModal
-  version.ts  version + release history
-tests/        theory + arrangement tests (vitest)
+  version.ts  version + release history (drives the in-app modal)
+tests/        theory + arrangement tests
 ```
 
-Theory, chart and arrangement are pure TypeScript — no React, no audio — and are unit
-tested directly.
+## What it isn't (yet)
 
-## Deployment
-
-- Source: <https://github.com/rayfoolshs/guitar-solo-maestro> (public)
-- Live: <https://rayfoolshs.github.io/guitar-solo-maestro/>
-
-Pushes to `main` run tests, build, and deploy to GitHub Pages via
-`.github/workflows/deploy.yml`. The bundle uses a relative base, so it runs from any
-sub-path.
+No melody entry, no rhythm notation, one key per chart (so Blue Bossa's D♭ bridge is flagged
+as interchange rather than a modulation), and no phone-specific layout. Those are the next
+items in [`BUILD_PLAN.md`](BUILD_PLAN.md).
 
 ## Docs
 
 - [`BUILD_PLAN.md`](BUILD_PLAN.md) — architecture, theory engine, arrangement, roadmap
 - [`CHANGELOG.md`](CHANGELOG.md) — version history
+
+## Deployment
+
+- Source: <https://github.com/rayfoolshs/guitar-solo-maestro>
+- Live: <https://rayfoolshs.github.io/guitar-solo-maestro/>
+
+Pushes to `main` run tests, build, and deploy to GitHub Pages via
+`.github/workflows/deploy.yml`. The bundle uses a relative base, so it runs from any
+sub-path.
 
 ## Credits
 
