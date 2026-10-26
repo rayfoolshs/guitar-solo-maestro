@@ -69,7 +69,10 @@ tested directly.
 
 ## Deployment
 
-Pushes to `main` build and deploy to GitHub Pages via
+- Source: <https://github.com/rayfoolshs/guitar-solo-maestro> (public)
+- Live: <https://rayfoolshs.github.io/guitar-solo-maestro/>
+
+Pushes to `main` run tests, build, and deploy to GitHub Pages via
 `.github/workflows/deploy.yml`. The bundle uses a relative base, so it runs from any
 sub-path.
 

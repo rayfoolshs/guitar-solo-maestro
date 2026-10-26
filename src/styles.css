@@ -6,7 +6,8 @@
 @font-face {
   font-family: 'Bravura';
   src: url('../fonts/Bravura.otf') format('opentype');
-  font-display: swap;
+  /* block, not swap: the glyphs are private-use codepoints, so a fallback shows tofu */
+  font-display: block;
 }
 
 :root {
