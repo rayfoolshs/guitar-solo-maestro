@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Chart } from '../chart/model';
 import { autoName, beatsPerBar, prettyChord } from '../chart/model';
 import type { KeyInfo } from '../theory/keys';
 import { mod12 } from '../theory/pitch';
 import type { Candidate } from '../theory/suggest';
+
+const clampBar = (n: number, last: number) => Math.max(0, Math.min(last, n));
 
 const SHARP_STEPS = [0, 3, -2, 2, 5, 1, 4];
 const FLAT_STEPS = [4, 1, 5, 2, 6, 3, 7];
@@ -48,24 +50,52 @@ export function Leadsheet(props: Props) {
 
   const [edit, setEdit] = useState<{ bar: number; beat: number; value: string } | null>(null);
   const [drag, setDrag] = useState<{ a: number; b: number } | null>(null);
+  const dragRef = useRef<{ a: number; b: number } | null>(null);
+  const loopRangeRef = useRef(props.onLoopRange);
+  useEffect(() => { loopRangeRef.current = props.onLoopRange; }, [props.onLoopRange]);
+  const updateDrag = (next: { a: number; b: number } | null) => {
+    dragRef.current = next;
+    setDrag(next);
+  };
 
   useEffect(() => { setEdit(null); }, [chart.id]);
 
+  // fallback for browsers/situations where pointer capture does not deliver moves
   useEffect(() => {
-    if (!drag) return;
-    const finish = () => {
-      const from = Math.min(drag.a, drag.b);
-      const to = Math.max(drag.a, drag.b);
-      props.onLoopRange(from, to);
+    const barUnder = (x: number, y: number): number | null => {
+      const el = document.elementFromPoint(x, y) as HTMLElement | null;
+      const sys = el?.closest('.sys') as HTMLElement | null;
+      if (!sys) return null;
+      const start = Number(sys.dataset.start);
+      const count = Number(sys.dataset.count);
+      const gutter = Number(sys.dataset.gutter);
+      const rect = sys.getBoundingClientRect();
+      const width = Math.max(1, (rect.width - gutter) / count);
+      return start + Math.max(0, Math.min(count - 1, Math.floor((x - rect.left - gutter) / width)));
+    };
+    const move = (e: PointerEvent) => {
+      const current = dragRef.current;
+      if (!current) return;
+      const bar = barUnder(e.clientX, e.clientY);
+      if (bar === null || bar === current.b) return;
+      dragRef.current = { ...current, b: bar };
+      setDrag(dragRef.current);
+      loopRangeRef.current(Math.min(current.a, bar), Math.max(current.a, bar));
+    };
+    const up = () => {
+      if (!dragRef.current) return;
+      dragRef.current = null;
       setDrag(null);
     };
-    window.addEventListener('pointerup', finish);
-    window.addEventListener('pointercancel', finish);
+    window.addEventListener('pointermove', move, { passive: true });
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
     return () => {
-      window.removeEventListener('pointerup', finish);
-      window.removeEventListener('pointercancel', finish);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
     };
-  }, [drag, props]);
+  }, []);
 
   const visible = chart.bars.slice(0, chart.visibleBars);
 
@@ -87,7 +117,45 @@ export function Leadsheet(props: Props) {
       const bandTo = showBand ? Math.min(range!.to, sysEnd) - startBar : 0;
 
       return (
-        <div className="sys" key={`${interactive ? 's' : 'p'}${si}`}>
+        <div
+          className="sys"
+          key={`${interactive ? 's' : 'p'}${si}`}
+          data-start={startBar}
+          data-count={sys.length}
+          data-gutter={gutter}
+          onPointerDown={interactive ? (e) => {
+            const el = e.target as HTMLElement;
+            if (el.closest('.chordbtn') || el.closest('input')) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const width = Math.max(1, (rect.width - gutter) / sys.length);
+            const idx = Math.floor((e.clientX - rect.left - gutter) / width);
+            const bar = clampBar(startBar + idx, chart.visibleBars - 1);
+            e.preventDefault();
+            // capture keeps move/up events coming even outside the chart
+            try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
+            onSelect(bar, null);
+            updateDrag({ a: bar, b: bar });
+            props.onLoopRange(bar, bar);
+          } : undefined}
+          onPointerMove={interactive ? (e) => {
+            const current = dragRef.current;
+            if (!current) return;
+            const rect = e.currentTarget.getBoundingClientRect();
+            const width = Math.max(1, (rect.width - gutter) / sys.length);
+            const idx = Math.floor((e.clientX - rect.left - gutter) / width);
+            const bar = clampBar(startBar + idx, chart.visibleBars - 1);
+            if (bar !== current.b) {
+              e.preventDefault();
+              updateDrag({ ...current, b: bar });
+              props.onLoopRange(Math.min(current.a, bar), Math.max(current.a, bar));
+            }
+          } : undefined}
+          onPointerUp={interactive ? (e) => {
+            try { e.currentTarget.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+            updateDrag(null);
+          } : undefined}
+          onPointerCancel={interactive ? () => updateDrag(null) : undefined}
+        >
           {showBand && (
             <div
               className={`loopband${drag ? ' live' : ''}`}
@@ -108,14 +176,8 @@ export function Leadsheet(props: Props) {
                 <div
                   className={`barx${active ? ' playing' : ''}`}
                   key={bar.id}
-                  onPointerDown={interactive ? (e) => {
-                    const el = e.target as HTMLElement;
-                    if (el.closest('.chordbtn') || el.closest('input')) return;
-                    e.preventDefault();
-                    onSelect(barIndex, null);
-                    setDrag({ a: barIndex, b: barIndex });
-                  } : undefined}
-                  onPointerEnter={interactive ? () => setDrag((d) => (d ? { ...d, b: barIndex } : d)) : undefined}
+                  role="group"
+                  aria-label={`Bar ${barIndex + 1}`}
                 >
                   {Array.from({ length: bpb }).map((_, beat) => {
                     const slot = bar.slots.find((s) => s.beat === beat);
