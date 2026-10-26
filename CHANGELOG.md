@@ -3,6 +3,16 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
+## 0.4.0 — 2026-10-26 · Loop a range by dragging
+
+- Drag across the chart — chord lane, stave or scale lane — to set an **A–B loop range**.
+  It commits on press (a click loops one bar) and extends live as you drag.
+- The header shows the active range (`A–B 5–8`); an amber band marks the looped bars.
+- Pointer capture on the system keeps the drag alive outside the chart, with a window-level
+  fallback for safety.
+- Distribution: public source repository, with `.github/workflows/deploy.yml` running tests,
+  build and the Pages deploy on every push to `main`.
+
 ## 0.3.0 — 2026-10-26 · Print, docs and version history
 
 - Printing reproduces the on-screen leadsheet: 8 bars per system, A4 landscape, title

@@ -3,7 +3,7 @@
 A practice companion for soloing over changes: type a chart, get a scale for every chord,
 see it on a 24-fret neck, and play the progression with piano, bass and drums.
 
-**v0.3.0** · made by Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
+**v0.4.0** · made by Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
 
 ![](guitar-solo-maestro-screen.jpg)
 
@@ -23,7 +23,7 @@ npm test         # theory / arrangement tests
 - Fit view (8 bars per system) or Comfortable (4 bars per system).
 - Click any beat to type a chord; empty slots appear on hover. Enter commits, Escape cancels.
 - `− / +` bar stepper, 4–32 bars. Hidden bars keep their chords.
-- **Drag across the stave to set an A–B loop.**
+- **Drag across the chart to set an A–B loop** — it commits on press and extends live.
 - Chart menu: reset to 4 bars, new chart, load Blue Bossa, clear chords, fit/comfortable.
 - Key auto-detection with confidence, overridable from the Key pill. Charts autosave.
 

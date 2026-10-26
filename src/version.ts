@@ -1,4 +1,4 @@
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 export const BUILD_DATE = '2026-10-26';
 
 export interface Release {
@@ -10,6 +10,19 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.4.0',
+    date: '2026-10-26',
+    title: 'Loop a range by dragging',
+    items: [
+      'Drag across the chart — chord lane, stave or scale lane — to set an A–B loop range.',
+      'The range commits the moment you press, so a single click loops one bar, and it extends live as you drag.',
+      'The header tracks it: "A–B 5–8" replaces the plain Loop button while a range is active.',
+      'Pointer capture keeps the drag alive outside the chart, with a window-level fallback.',
+      'An amber band marks the looped bars on the leadsheet.',
+      'Published as a public repository with GitHub Pages deploying on every push.',
+    ],
+  },
   {
     version: '0.3.0',
     date: '2026-10-26',
