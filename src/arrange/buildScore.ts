@@ -32,14 +32,27 @@ function placeChords(chart: Chart, key: KeyInfo): PlacedChord[] {
   const placed: PlacedChord[] = [];
   const bars = chart.bars.slice(0, chart.visibleBars);
 
+  let last: PlacedChord | null = null;
+
   bars.forEach((bar, barIndex) => {
+    if (bar.slots.length === 0 && last) {
+      placed.push({
+        ...last,
+        bar: barIndex,
+        beat: 0,
+        absBeat: barIndex * bpb,
+        nextRootPc: null,
+      });
+      return;
+    }
+
     bar.slots.forEach((slot) => {
       const parsed = parseChord(slot.input);
       if (!parsed.ok) return;
       const candidates = suggestForChord(parsed, key);
       const pinned = chart.pins[slot.id];
       const chosen = (pinned && candidates.find((c) => c.scaleId === pinned)) || candidates[0];
-      placed.push({
+      last = {
         bar: barIndex,
         beat: slot.beat,
         absBeat: barIndex * bpb + slot.beat,
@@ -49,7 +62,8 @@ function placeChords(chart: Chart, key: KeyInfo): PlacedChord[] {
         qualityFamily: parsed.quality.family,
         nextRootPc: null,
         scalePcs: chosen ? chosen.pcs : parsed.intervals,
-      });
+      };
+      placed.push(last);
     });
   });
 

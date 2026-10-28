@@ -1,5 +1,5 @@
-export const VERSION = '0.4.0';
-export const BUILD_DATE = '2026-10-26';
+export const VERSION = '0.4.1';
+export const BUILD_DATE = '2026-10-28';
 
 export interface Release {
   version: string;
@@ -10,6 +10,15 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.4.1',
+    date: '2026-10-28',
+    title: 'Sustain chords through blank bars',
+    items: [
+      'A blank bar now repeats the chord from the bar before it instead of falling silent.',
+      'Chords carry through any run of empty bars, and stop when the next chord is entered.',
+    ],
+  },
   {
     version: '0.4.0',
     date: '2026-10-26',

@@ -3,7 +3,7 @@
 A practice companion for soloing over changes: type a chart, get a scale for every chord,
 see it on a 24-fret neck, and play the progression with piano, bass and drums.
 
-Current build: **v0.4.0**. See `CHANGELOG.md` for history and `README.md` for usage.
+Current build: **v0.4.1**. See `CHANGELOG.md` for history and `README.md` for usage.
 
 ---
 

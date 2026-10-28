@@ -3,6 +3,12 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
+## 0.4.1 — 2026-10-28 · Sustain chords through blank bars
+
+- **Fixed:** an empty bar now inherits the previous chord instead of dropping to silence, so
+  a chord written once keeps playing across any run of blank bars until the next chord is
+  entered.
+
 ## 0.4.0 — 2026-10-26 · Loop a range by dragging
 
 - Drag across the chart — chord lane, stave or scale lane — to set an **A–B loop range**.
