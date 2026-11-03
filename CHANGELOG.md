@@ -3,6 +3,13 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
+## 0.4.2 — 2026-11-03 · Fretboard oriented like the guitar
+
+- **Fixed:** the fretboard was mirrored — the low E rendered on the top row. Strings now
+  run low E (bottom) up to high E (top), so reading from the lowest string up gives
+  E A D G B E, the way the neck looks in playing position. String thickness and the
+  position dot markers follow the strings.
+
 ## 0.4.1 — 2026-10-28 · Sustain chords through blank bars
 
 - **Fixed:** an empty bar now inherits the previous chord instead of dropping to silence, so

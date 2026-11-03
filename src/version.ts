@@ -1,5 +1,5 @@
-export const VERSION = '0.4.1';
-export const BUILD_DATE = '2026-10-28';
+export const VERSION = '0.4.2';
+export const BUILD_DATE = '2026-11-03';
 
 export interface Release {
   version: string;
@@ -10,6 +10,15 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.4.2',
+    date: '2026-11-03',
+    title: 'Fretboard oriented like the guitar',
+    items: [
+      'The fretboard is drawn as the neck looks in playing position: low E on the bottom row, high E on top.',
+      'Reading from the lowest string up gives E A D G B E; string thickness and the position dots follow the strings.',
+    ],
+  },
   {
     version: '0.4.1',
     date: '2026-10-28',

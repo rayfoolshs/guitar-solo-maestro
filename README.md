@@ -4,7 +4,7 @@ A practice companion for guitarists who want to solo over chord changes. You giv
 tune; it tells you **which scale to play over every chord** and shows you **where those
 notes sit on the neck** — then plays the progression back so you can practise against it.
 
-**v0.4.1** · [Play it live](https://rayfoolshs.github.io/guitar-solo-maestro/) · made by
+**v0.4.2** · [Play it live](https://rayfoolshs.github.io/guitar-solo-maestro/) · made by
 Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
 
 ![Guitar Solo Maestro](guitar-solo-maestro-screen.jpg)
@@ -36,9 +36,10 @@ opens on **Blue Bossa** in C minor — two choruses, three flats on the stave.
 
 **See it on the neck**
 
-A 24-fret fretboard with true fret spacing — tonic ringed in amber, chord tones teal, other
-scale tones sand, tensions dashed. Degree or note labels, and eight position windows
-(All, 1–5 … 17–24).
+A 24-fret fretboard with true fret spacing, oriented the way the neck looks in playing
+position — low E on the bottom row up to high E on top. Tonic ringed in amber, chord tones
+teal, other scale tones sand, tensions dashed. Degree or note labels, and eight position
+windows (All, 1–5 … 17–24).
 
 **Play it**
 

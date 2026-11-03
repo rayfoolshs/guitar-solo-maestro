@@ -6,9 +6,14 @@ export const STRING_NAMES = ['E', 'A', 'D', 'G', 'B', 'E'];
 
 export const FRET_COUNT = 24;
 
-/** Vertical position of a string row in the fretboard SVG. */
+/**
+ * Vertical position of a string row in the fretboard SVG.
+ * Oriented like a guitar in playing position: high E (index 5) on top,
+ * low E (index 0) on the bottom, so reading from the lowest string up
+ * gives E A D G B E.
+ */
 export function rowY(index: number): number {
-  return 24 + index * 26;
+  return 24 + (5 - index) * 26;
 }
 
 export function noteAt(stringIndex: number, fret: number): number {
