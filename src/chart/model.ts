@@ -89,6 +89,35 @@ export function blueBossa(): Chart {
   };
 }
 
+const AL_A: string[] = [
+  'Cm7', 'F7', 'Bbmaj7', 'Ebmaj7', 'Am7b5', 'D7', 'Gm7', 'Gm7',
+];
+const AL_B: string[] = [
+  'Am7b5', 'D7', 'Gm7', 'Gm7', 'Cm7', 'F7', 'Bbmaj7', 'Bbmaj7',
+];
+
+export function autumnLeaves(): Chart {
+  const bars: Bar[] = [];
+  for (const input of [...AL_A, ...AL_A, ...AL_B, ...AL_A]) {
+    bars.push({ id: uid('b'), slots: [{ id: uid('s'), beat: 0, input }] });
+  }
+  return {
+    id: uid('c'),
+    name: 'Autumn Leaves',
+    timeSignature: '4/4',
+    bars,
+    visibleBars: 32,
+    keyManual: null,
+    tempo: 132,
+    style: 'jazz',
+    swing: 0.62,
+    countIn: true,
+    metronome: false,
+    pianoOctave: 0,
+    pins: {},
+  };
+}
+
 export function setVisibleBars(chart: Chart, n: number): Chart {
   const count = Math.max(4, Math.min(32, n));
   const bars = [...chart.bars];

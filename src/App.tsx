@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  blueBossa, makeEmptyChart, parseSlots, setChord, setVisibleBars, slotRefs,
+  blueBossa, autumnLeaves, makeEmptyChart, parseSlots, setChord, setVisibleBars, slotRefs,
   autoName, beatsPerBar, prettyChord, type Chart, type Style,
 } from './chart/model';
 import { detectKey, makeKey, type KeyInfo } from './theory/keys';
@@ -33,7 +33,7 @@ function loadChart(): Chart {
       }
     }
   } catch { /* ignore */ }
-  return blueBossa();
+  return autumnLeaves();
 }
 
 export default function App() {
@@ -174,6 +174,7 @@ export default function App() {
   const chartActions = {
     resetFour: () => setChart((c) => setVisibleBars(c, 4)),
     loadBlueBossa: () => { setChart(blueBossa()); setSelection({ bar: 5, slotId: null }); },
+    loadAutumnLeaves: () => { setChart(autumnLeaves()); setSelection({ bar: 4, slotId: null }); },
     clear: () => setChart((c) => ({
       ...c,
       bars: c.bars.map((b) => ({ ...b, slots: [] })),

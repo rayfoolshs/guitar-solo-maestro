@@ -23,6 +23,7 @@ interface Props {
   actions: {
     resetFour: () => void;
     loadBlueBossa: () => void;
+    loadAutumnLeaves: () => void;
     clear: () => void;
     newChart: () => void;
     fit: () => void;
@@ -103,6 +104,7 @@ export function Header(props: Props) {
             <div className="dropdown">
               <button onClick={() => { props.actions.resetFour(); setMenu(null); }}>Reset to 4 bars</button>
               <button onClick={() => { props.actions.newChart(); setMenu(null); }}>New chart</button>
+              <button onClick={() => { props.actions.loadAutumnLeaves(); setMenu(null); }}>Load Autumn Leaves</button>
               <button onClick={() => { props.actions.loadBlueBossa(); setMenu(null); }}>Load Blue Bossa</button>
               <button onClick={() => { props.actions.clear(); setMenu(null); }}>Clear chords</button>
               <button onClick={() => { props.actions.fit(); setMenu(null); }}>Fit / Comfortable</button>
