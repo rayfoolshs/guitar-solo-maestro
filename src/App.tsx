@@ -13,7 +13,7 @@ import { Leadsheet } from './ui/Leadsheet';
 import { Mixer } from './ui/Mixer';
 import { Fretboard } from './ui/Fretboard';
 
-const STORAGE_KEY = 'gsm.chart.v1';
+const STORAGE_KEY = 'gsm.chart.v2';
 
 type LoopMode = 'off' | 'visible' | 'range';
 
