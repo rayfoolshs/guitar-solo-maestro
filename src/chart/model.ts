@@ -1,7 +1,8 @@
-import { parseChord, type ParsedChord } from '../theory/chords';
-import type { Mode } from '../theory/keys';
+import { parseChord, transposeChordSymbol, type ParsedChord } from '../theory/chords';
+import { mod12, preferFlatsFor } from '../theory/pitch';
+import { detectKey, makeKey, type Mode } from '../theory/keys';
 
-export type Style = 'jazz' | 'rock' | 'bossa';
+export type Style = 'jazz' | 'ballad' | 'shuffle' | 'rock' | 'funk' | 'bossa';
 
 export interface ChordSlot {
   id: string;
@@ -19,7 +20,7 @@ export interface Chart {
   name: string;
   timeSignature: '4/4' | '3/4';
   bars: Bar[];
-  visibleBars: number;      // 4–32, view length (hidden bars keep chords)
+  visibleBars: number;      // 4–64, view length (hidden bars keep chords)
   keyManual: { tonic: number; mode: Mode } | null;
   tempo: number;
   style: Style;
@@ -28,6 +29,11 @@ export interface Chart {
   metronome: boolean;
   pianoOctave: number;      // −2…+2, transposes the piano voicing
   pins: Record<string, string>; // slotId -> scaleId
+  transpose?: number;           // cumulative semitones applied to chord symbols
+  composer?: string;
+  year?: number;
+  form?: string;
+  tags?: string[];
 }
 
 let seq = 0;
@@ -118,15 +124,148 @@ export function autumnLeaves(): Chart {
   };
 }
 
-export function setVisibleBars(chart: Chart, n: number): Chart {
-  const count = Math.max(4, Math.min(32, n));
+type BarInput = string | string[];
+
+/** Build bars from one chord (string) or several chords (array spread evenly across the bar). */
+function barsFromInputs(rows: BarInput[]): Bar[] {
+  return rows.map((row) => {
+    const inputs = Array.isArray(row) ? row : [row];
+    const step = 4 / inputs.length;
+    return {
+      id: uid('b'),
+      slots: inputs.map((input, i) => ({
+        id: uid('s'),
+        beat: i === 0 ? 0 : Math.round(i * step * 100) / 100,
+        input,
+      })),
+    };
+  });
+}
+
+interface PresetOptions {
+  tempo: number;
+  style: Style;
+  swing: number;
+}
+
+function presetChart(name: string, rows: BarInput[], opts: PresetOptions): Chart {
+  const bars = barsFromInputs(rows);
+  return {
+    id: uid('c'),
+    name,
+    timeSignature: '4/4',
+    bars,
+    visibleBars: Math.min(64, bars.length),
+    keyManual: null,
+    tempo: opts.tempo,
+    style: opts.style,
+    swing: opts.swing,
+    countIn: true,
+    metronome: false,
+    pianoOctave: 0,
+    pins: {},
+  };
+}
+
+/** Herbie Hancock — 16 bars, four-bar blocks of Fm7 / Db7 / Dm7 / Fm7. */
+export function cantaloupeIsland(): Chart {
+  return presetChart(
+    'Cantaloupe Island',
+    [
+      'Fm7', 'Fm7', 'Fm7', 'Fm7',
+      'Db7', 'Db7', 'Db7', 'Db7',
+      'Dm7', 'Dm7', 'Dm7', 'Dm7',
+      'Fm7', 'Fm7', 'Fm7', 'Fm7',
+    ],
+    { tempo: 100, style: 'funk', swing: 0 },
+  );
+}
+
+/** Coltrane — 12-bar minor blues in C. */
+export function mrPC(): Chart {
+  return presetChart(
+    'Mr. P.C.',
+    ['Cm7', 'Fm7', 'Cm7', 'Cm7', 'Fm7', 'Fm7', 'Cm7', 'Cm7', 'Ab7', 'G7', 'Cm7', 'G7'],
+    { tempo: 152, style: 'shuffle', swing: 1 },
+  );
+}
+
+/** Erroll Garner — 32-bar AABA ballad in E♭. */
+export function misty(): Chart {
+  const aSection: BarInput[] = [
+    'Ebmaj7',
+    ['Bbm7', 'Eb7'],
+    'Abmaj7',
+    ['Abm7', 'Db7'],
+    ['Ebmaj7', 'Cm7'],
+    ['Fm7', 'Bb7'],
+    ['Gm7', 'C7'],
+    ['Fm7', 'Bb7'],
+  ];
+  const bridge: BarInput[] = [
+    'Bbm7', 'Eb7', 'Abmaj7', 'Abmaj7',
+    'Am7', 'D7', 'Gm7', 'C7',
+  ];
+  const aFinal: BarInput[] = [
+    'Ebmaj7',
+    ['Bbm7', 'Eb7'],
+    'Abmaj7',
+    ['Abm7', 'Db7'],
+    ['Ebmaj7', 'Cm7'],
+    ['Fm7', 'Bb7'],
+    'Ebmaj7',
+    'Ebmaj7',
+  ];
+  return presetChart('Misty', [...aSection, ...aSection, ...bridge, ...aFinal], {
+    tempo: 66,
+    style: 'ballad',
+    swing: 0.62,
+  });
+}
+
+/** Wrap a cumulative transposition to the shortest interval (−5…+6). */
+const wrapTranspose = (semitones: number): number => {
+  const wrapped = ((semitones % 12) + 12) % 12;
+  return wrapped > 6 ? wrapped - 12 : wrapped;
+};
+
+/**
+ * Rewrite every chord symbol in the chart by `semitones`, update a manual key,
+ * and track the cumulative offset for display/reset. Spelling follows the
+ * destination key, so transposing repeatedly stays readable.
+ */
+export function transposeChart(chart: Chart, semitones: number): Chart {
+  if (!semitones) return chart;
+  const currentKey = chart.keyManual
+    ? makeKey(chart.keyManual.tonic, chart.keyManual.mode)
+    : detectKey(parseSlots(chart)).key;
+  const flats = preferFlatsFor(mod12(currentKey.tonic + semitones), currentKey.mode);
+  const keyManual = chart.keyManual
+    ? { ...chart.keyManual, tonic: mod12(chart.keyManual.tonic + semitones) }
+    : null;
+  const bars = chart.bars.map((bar) => ({
+    ...bar,
+    slots: bar.slots.map((slot) => ({
+      ...slot,
+      input: transposeChordSymbol(slot.input, semitones, flats),
+    })),
+  }));
+  return {
+    ...chart,
+    bars,
+    keyManual,
+    transpose: wrapTranspose((chart.transpose ?? 0) + semitones),
+  };
+}
+
+export function setVisibleBars(chart: Chart, n: number): Chart {  const count = Math.max(4, Math.min(64, n));
   const bars = [...chart.bars];
   while (bars.length < count) bars.push(makeBar(4));
   return { ...chart, bars, visibleBars: count };
 }
 
 export function setBarCountRaw(chart: Chart, n: number): Chart {
-  const count = Math.max(4, Math.min(32, n));
+  const count = Math.max(4, Math.min(64, n));
   const bars = chart.bars.slice(0, count);
   while (bars.length < count) bars.push(makeBar(4));
   return { ...chart, bars, visibleBars: Math.min(chart.visibleBars, count) };

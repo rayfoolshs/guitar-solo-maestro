@@ -1,4 +1,5 @@
 import type { Chart, Style } from '../chart/model';
+import { STYLES, groupedStyles } from '../arrange/styles';
 import type { Position } from '../audio/engine';
 import type { LoadProgress } from '../audio/soundfont';
 
@@ -13,6 +14,9 @@ interface Props {
   onSwing: (v: number) => void;
   onTempo: (v: number) => void;
   onStyle: (s: Style) => void;
+  transpose: number;
+  onTranspose: (semitones: number) => void;
+  onTransposeReset: () => void;
   onPlay: () => void;
   onStop: () => void;
   range: { from: number; to: number };
@@ -42,6 +46,7 @@ function bankLabel(b: LoadProgress): string {
 export function Mixer(props: Props) {
   const { chart } = props;
   const bar = props.position.playing ? props.position.bar + 1 : props.range.from + 1;
+  const swingEnabled = STYLES[chart.style]?.swingEnabled ?? false;
 
   return (
     <section className="card mixer">
@@ -63,10 +68,30 @@ export function Mixer(props: Props) {
         </div>
       </div>
       <select className="tp sel full" value={chart.style} onChange={(e) => props.onStyle(e.target.value as Style)}>
-        <option value="jazz">Jazz Swing</option>
-        <option value="rock">Rock</option>
-        <option value="bossa">Bossa Nova</option>
+        {groupedStyles().map(({ group, styles }) => (
+          <optgroup key={group} label={group}>
+            {styles.map((s) => (
+              <option key={s.id} value={s.id}>{s.label}</option>
+            ))}
+          </optgroup>
+        ))}
       </select>
+
+      <div className="swingrow transposer">
+        <span className="lbl">Transpose</span>
+        <div className="tstep">
+          <button onClick={() => props.onTranspose(-1)} title="Down a semitone" aria-label="Transpose down a semitone">−</button>
+          <button
+            className="tval"
+            onClick={props.onTransposeReset}
+            disabled={props.transpose === 0}
+            title="Reset to the original key"
+          >
+            {props.transpose > 0 ? `+${props.transpose}` : props.transpose}
+          </button>
+          <button onClick={() => props.onTranspose(1)} title="Up a semitone" aria-label="Transpose up a semitone">+</button>
+        </div>
+      </div>
 
       <div className="channels">
         {CHANNELS.map((ch) => (
@@ -107,7 +132,7 @@ export function Mixer(props: Props) {
           </div>
         ))}
 
-        <div className={`swingrow${chart.style !== 'jazz' ? ' disabled' : ''}`}>
+        <div className={`swingrow${swingEnabled ? '' : ' disabled'}`}>
           <span className="lbl">Swing</span>
           <input
             className="slider"
@@ -115,11 +140,11 @@ export function Mixer(props: Props) {
             min={0}
             max={100}
             value={Math.round(chart.swing * 100)}
-            disabled={chart.style !== 'jazz'}
+            disabled={!swingEnabled}
             onChange={(e) => props.onSwing(Number(e.target.value) / 100)}
             aria-label="Swing strength"
           />
-          <span className="db">{chart.style === 'jazz' ? `${Math.round(chart.swing * 100)}%` : '—'}</span>
+          <span className="db">{swingEnabled ? `${Math.round(chart.swing * 100)}%` : '—'}</span>
         </div>
       </div>
     </section>

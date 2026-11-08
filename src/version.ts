@@ -1,5 +1,5 @@
-export const VERSION = '0.4.2';
-export const BUILD_DATE = '2026-11-03';
+export const VERSION = '0.9.0';
+export const BUILD_DATE = '2026-11-08';
 
 export interface Release {
   version: string;
@@ -10,6 +10,80 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.9.0',
+    date: '2026-11-08',
+    title: 'Transpose charts',
+    items: [
+      'Transpose the whole chart up or down a semitone from the mixer; chords, key, analysis and playback follow.',
+      'Chord spelling follows the destination key, and the offset shows the cumulative transposition.',
+      'Click the offset to reset to the original key. Transposing while playing applies from the next bar.',
+    ],
+  },
+  {
+    version: '0.8.0',
+    date: '2026-11-08',
+    title: 'MIDI export',
+    items: [
+      'Export the current arrangement as a Standard MIDI File: format 1, PPQ 480, separate piano, bass and drums tracks.',
+      'Tempo, time signature and swing match playback; the visible bars are exported without count-in or loop.',
+      'Chart ▾ → Export MIDI… downloads name.mid.',
+    ],
+  },
+  {
+    version: '0.7.0',
+    date: '2026-11-08',
+    title: 'Save, load and back up charts',
+    items: [
+      'My charts library: snapshot the working chart, then update, rename, duplicate, delete and reload saved versions.',
+      'Versioned JSON export/import (.gsm.json) with strict validation, value clamping and a 1 MB cap.',
+      'Top-level New chart button, with a confirmation before replacing a chart that already has chords.',
+      'The library is capped at 100 charts and lives separately from the autosaved working chart.',
+    ],
+  },
+  {
+    version: '0.6.1',
+    date: '2026-11-08',
+    title: 'Better piano comping',
+    items: [
+      'Piano now plays voice-led rootless voicings for jazz, funk and bossa: guide tones plus a scale colour tone, with the root left to the bass.',
+      'Ballads add a low root under the guide tones; the blues shuffle uses a root–third–seventh shell; rock keeps its power chords.',
+      'Comping rhythms vary across two- and four-bar cycles instead of repeating the same pattern every bar.',
+    ],
+  },
+  {
+    version: '0.6.0',
+    date: '2026-11-08',
+    title: 'Core 100 standards library',
+    items: [
+      'A bundled Core 100 standards library with search, style filters and idiom tags, loadable from the header or the Chart menu.',
+      'New lead-sheet chord qualities: 7♭9, 7♯9, 7♯11, 7♭13, 7♭5, 7♯5, alt, 9♯11, 13♯11, 11, m11, maj7♯11, m(maj7), m(add9) and add11.',
+      'Bar cap raised from 32 to 64 for long forms such as Cherokee (64) and All the Things You Are (36).',
+      'Charts now carry composer, year, form and tags, shown in the leadsheet and print header.',
+      'Opening a standard stops playback and starts on bar 1.',
+    ],
+  },
+  {
+    version: '0.5.1',
+    date: '2026-11-08',
+    title: 'Live tempo changes',
+    items: [
+      'Changing the tempo while playing now takes effect from the next bar instead of waiting for the next Play.',
+      'The sounding bar finishes at its scheduled tempo; bar position, the bar counter and the fretboard highlight follow the new tempo.',
+    ],
+  },
+  {
+    version: '0.5.0',
+    date: '2026-11-08',
+    title: 'Funk, shuffle and ballad',
+    items: [
+      'Three new feels: Funk (straight 16ths), Blues Shuffle (12/8 triplet) and Jazz Ballad (sparse brushes).',
+      'Style definitions live in one descriptor table; the style menu is grouped Jazz / Groove / Latin and the swing slider enables per style.',
+      'New preset charts: Cantaloupe Island, Mr. P.C. and Misty.',
+      'Changing style, swing or key while playing now re-arranges from the next bar instead of waiting for the next Play.',
+      'Loading a preset stops playback before swapping the chart.',
+    ],
+  },
   {
     version: '0.4.2',
     date: '2026-11-03',

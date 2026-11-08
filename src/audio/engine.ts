@@ -33,9 +33,10 @@ export class AudioEngine {
   private nextBar = 0;
   private nextBarTime = 0;
   private anchorTime = 0;
-  private loopLen = 1;
   private barDur = 2;
   private countInBars = 0;
+  private countInDur = 2;
+  private barLog: Array<{ time: number; bar: number; dur: number }> = [];
   private running = false;
   private volumes: Record<ChannelId, number> = { piano: -6, bass: -9, drums: -8 };
   private mutes: Record<ChannelId, boolean> = { piano: false, bass: false, drums: false };
@@ -99,11 +100,12 @@ export class AudioEngine {
     this.events = events;
     this.opts = opts;
     this.barDur = (opts.beatsPerBar * 60) / opts.tempo;
-    this.loopLen = opts.toBar - opts.fromBar + 1;
+    this.countInDur = this.barDur;
     this.countInBars = opts.countIn ? 1 : 0;
     this.nextBar = opts.fromBar;
     this.anchorTime = ctx.currentTime + 0.08 + this.countInBars * this.barDur;
     this.nextBarTime = this.anchorTime;
+    this.barLog = [];
     this.running = true;
 
     if (opts.countIn) this.click(0, ctx.currentTime + 0.08, 1000, 0.05);
@@ -118,9 +120,30 @@ export class AudioEngine {
     }
     this.running = false;
     this.events = [];
+    this.barLog = [];
     if (this.ctx && this.gains) {
       // let tails ring but avoid new notes; nothing else needed
     }
+  }
+
+  /**
+   * Change tempo without stopping. The bar already sounding finishes at its
+   * scheduled tempo; the next bar starts at its already-queued time and every bar
+   * after it runs at the new tempo.
+   */
+  setTempo(tempo: number) {
+    if (!this.running || !this.opts) return;
+    this.opts = { ...this.opts, tempo };
+    this.barDur = (this.opts.beatsPerBar * 60) / tempo;
+  }
+
+  /**
+   * Swap the arrangement without interrupting playback. Bars already queued keep
+   * playing; the next scheduled bar uses the new events.
+   */
+  setEvents(events: NoteEvent[]) {
+    if (!this.running) return;
+    this.events = events;
   }
 
   position(): Position {
@@ -132,15 +155,27 @@ export class AudioEngine {
       const remaining = this.anchorTime - now;
       return {
         bar: this.opts.fromBar,
-        beat: Math.max(0, 1 - remaining / this.barDur) * this.opts.beatsPerBar,
+        beat: Math.max(0, 1 - remaining / this.countInDur) * this.opts.beatsPerBar,
         playing: true,
         counting: true,
       };
     }
-    const elapsedBars = Math.floor((now - this.anchorTime) / this.barDur);
-    const bar = this.opts.fromBar + (elapsedBars % this.loopLen);
-    const frac = ((now - this.anchorTime) % this.barDur) / this.barDur;
-    return { bar, beat: frac * this.opts.beatsPerBar, playing: true, counting: false };
+
+    // The most recent scheduled bar is the one sounding now. Reading the log
+    // (rather than deriving from anchorTime) keeps position correct across
+    // live tempo changes, where consecutive bars have different durations.
+    let current: { time: number; bar: number; dur: number } | null = null;
+    for (const entry of this.barLog) {
+      if (entry.time <= now && (!current || entry.time >= current.time)) current = entry;
+    }
+
+    if (!current) {
+      const frac = Math.max(0, Math.min(1, (now - this.anchorTime) / this.barDur));
+      return { bar: this.opts.fromBar, beat: frac * this.opts.beatsPerBar, playing: true, counting: false };
+    }
+
+    const frac = Math.max(0, Math.min(1, (now - current.time) / current.dur));
+    return { bar: current.bar, beat: frac * this.opts.beatsPerBar, playing: true, counting: false };
   }
 
   private tick() {
@@ -151,6 +186,7 @@ export class AudioEngine {
     let guard = 0;
     while (this.nextBarTime < horizon && guard++ < 64) {
       this.scheduleBar(this.nextBar, this.nextBarTime);
+      this.barLog.push({ time: this.nextBarTime, bar: this.nextBar, dur: this.barDur });
       this.nextBarTime += this.barDur;
       this.nextBar += 1;
       if (this.nextBar > opts.toBar) {
@@ -161,6 +197,10 @@ export class AudioEngine {
         }
         this.nextBar = opts.fromBar;
       }
+    }
+    const cutoff = ctx.currentTime - 2;
+    if (this.barLog.length > 4) {
+      this.barLog = this.barLog.filter((entry) => entry.time + entry.dur > cutoff);
     }
   }
 

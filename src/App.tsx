@@ -1,17 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  blueBossa, autumnLeaves, makeEmptyChart, parseSlots, setChord, setVisibleBars, slotRefs,
-  autoName, beatsPerBar, prettyChord, type Chart, type Style,
+  blueBossa, autumnLeaves, cantaloupeIsland, mrPC, misty, makeEmptyChart, parseSlots,
+  setChord, setVisibleBars, slotRefs, autoName, beatsPerBar, prettyChord, transposeChart,
+  type Chart, type Style,
 } from './chart/model';
 import { detectKey, makeKey, type KeyInfo } from './theory/keys';
 import { suggestForChord, suggestGlobal, transitionScore, type Candidate } from './theory/suggest';
 import { buildScore } from './arrange/buildScore';
+import { downloadMidi } from './arrange/midi';
 import { engine, type Position } from './audio/engine';
 import type { LoadProgress } from './audio/soundfont';
 import { Header } from './ui/Header';
 import { Leadsheet } from './ui/Leadsheet';
 import { Mixer } from './ui/Mixer';
 import { Fretboard } from './ui/Fretboard';
+import { StandardsModal } from './ui/StandardsModal';
+import { ChartsModal } from './ui/ChartsModal';
 
 const STORAGE_KEY = 'gsm.chart.v2';
 
@@ -49,6 +53,8 @@ export default function App() {
   const [raf, setRaf] = useState<number | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [bank, setBank] = useState<LoadProgress>({ phase: 'idle', loaded: 0, total: 0 });
+  const [standardsOpen, setStandardsOpen] = useState(false);
+  const [chartsOpen, setChartsOpen] = useState(false);
 
   const key: KeyInfo = useMemo(
     () => (chart.keyManual ? makeKey(chart.keyManual.tonic, chart.keyManual.mode) : detectKey(parseSlots(chart)).key),
@@ -109,6 +115,22 @@ export default function App() {
       engine.setMuted(ch, mutes[ch]);
     });
   }, [mutes]);
+
+  // Live re-arrangement: style, swing and key changes apply from the next scheduled bar
+  // instead of waiting for the next Play.
+  useEffect(() => {
+    if (!playing) return;
+    engine.setEvents(buildScore(chart, key, { style: chart.style, swing: chart.swing }));
+    // `chart` is read at call time; style/swing/key are the inputs that change the feel.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, chart.style, chart.swing, key]);
+
+  // Live tempo: the sounding bar finishes; the next bar starts at its queued time and
+  // every bar after it uses the new tempo.
+  useEffect(() => {
+    if (!playing) return;
+    engine.setTempo(chart.tempo);
+  }, [playing, chart.tempo]);
 
   const range = useMemo(() => {
     const last = Math.max(0, chart.visibleBars - 1);
@@ -171,16 +193,54 @@ export default function App() {
     setStatus(null);
   };
 
+  const loadPreset = (preset: () => Chart, bar: number) => {
+    stop();
+    setChart(preset());
+    setSelection({ bar, slotId: null });
+    setStatus(null);
+  };
+
+  const exportMidiFile = () => {    const hasChords = chart.bars
+      .slice(0, chart.visibleBars)
+      .some((bar) => bar.slots.some((slot) => slot.input.trim()));
+    if (!hasChords) {
+      setStatus('Add at least one chord before exporting MIDI.');
+      return;
+    }
+    const score = buildScore(chart, key, { style: chart.style, swing: chart.swing });
+    downloadMidi(chart, score);
+    setStatus(`Exported ${chart.name || 'chart'} as MIDI.`);
+  };
+
+  const transposeBy = (semitones: number) => {
+    setChart((c) => transposeChart(c, semitones));
+    setStatus(null);
+  };
+
+  const resetTranspose = () => {
+    setChart((c) => {
+      const offset = c.transpose ?? 0;
+      return offset ? transposeChart(c, -offset) : c;
+    });
+  };
+
   const chartActions = {
     resetFour: () => setChart((c) => setVisibleBars(c, 4)),
-    loadBlueBossa: () => { setChart(blueBossa()); setSelection({ bar: 5, slotId: null }); },
-    loadAutumnLeaves: () => { setChart(autumnLeaves()); setSelection({ bar: 4, slotId: null }); },
+    loadBlueBossa: () => loadPreset(blueBossa, 5),
+    loadAutumnLeaves: () => loadPreset(autumnLeaves, 4),
+    loadCantaloupeIsland: () => loadPreset(cantaloupeIsland, 0),
+    loadMrPC: () => loadPreset(mrPC, 0),
+    loadMisty: () => loadPreset(misty, 0),
     clear: () => setChart((c) => ({
       ...c,
       bars: c.bars.map((b) => ({ ...b, slots: [] })),
       pins: {},
     })),
-    newChart: () => { setChart(makeEmptyChart()); setSelection({ bar: 0, slotId: null }); },
+    newChart: () => {
+      const hasChords = chart.bars.some((bar) => bar.slots.some((slot) => slot.input.trim()));
+      if (hasChords && !window.confirm('Start a new chart? The current chart will be replaced.')) return;
+      loadPreset(makeEmptyChart, 0);
+    },
     fit: () => setView((v) => (v === 'fit' ? 'comfortable' : 'fit')),
   };
 
@@ -205,7 +265,23 @@ export default function App() {
           setChart((c) => ({ ...c, keyManual: { tonic: Number(tonic), mode: mode as 'major' | 'minor' } }));
         }}
         onPrint={() => window.print()}
+        onOpenStandards={() => setStandardsOpen(true)}
+        onOpenCharts={() => setChartsOpen(true)}
+        onExportMidi={exportMidiFile}
         actions={chartActions}
+      />
+
+      <StandardsModal
+        open={standardsOpen}
+        onClose={() => setStandardsOpen(false)}
+        onLoad={(next) => loadPreset(() => next, 0)}
+      />
+
+      <ChartsModal
+        open={chartsOpen}
+        chart={chart}
+        onClose={() => setChartsOpen(false)}
+        onLoad={(next) => loadPreset(() => next, 0)}
       />
 
       <main>
@@ -240,6 +316,9 @@ export default function App() {
           onVolume={(ch, db) => setVolumes((v) => ({ ...v, [ch]: db }))}
           onMute={(ch, m) => setMutes((m2) => ({ ...m2, [ch]: m }))}
           onSwing={(swing) => setChart((c) => ({ ...c, swing }))}
+          transpose={chart.transpose ?? 0}
+          onTranspose={transposeBy}
+          onTransposeReset={resetTranspose}
           pianoOctave={chart.pianoOctave ?? 0}
           onPianoOctave={(v) => setChart((c) => ({ ...c, pianoOctave: Math.max(-2, Math.min(2, v)) }))}
           onTempo={(tempo) => setChart((c) => ({ ...c, tempo }))}

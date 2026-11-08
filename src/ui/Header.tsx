@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Chart, Style } from '../chart/model';
+import { groupedStyles } from '../arrange/styles';
 import { ALL_KEYS } from '../theory/keys';
 import { VERSION } from '../version';
 import { VersionModal } from './VersionModal';
@@ -20,21 +21,21 @@ interface Props {
   onStyle: (s: Style) => void;
   onKeyChange: (value: string) => void;
   onPrint: () => void;
+  onOpenStandards: () => void;
+  onOpenCharts: () => void;
+  onExportMidi: () => void;
   actions: {
     resetFour: () => void;
     loadBlueBossa: () => void;
     loadAutumnLeaves: () => void;
+    loadCantaloupeIsland: () => void;
+    loadMrPC: () => void;
+    loadMisty: () => void;
     clear: () => void;
     newChart: () => void;
     fit: () => void;
   };
 }
-
-const STYLE_LABEL: Record<Style, string> = {
-  jazz: 'Jazz Swing',
-  rock: 'Rock',
-  bossa: 'Bossa Nova',
-};
 
 export function Header(props: Props) {
   const [menu, setMenu] = useState<'chart' | 'loop' | null>(null);
@@ -90,8 +91,12 @@ export function Header(props: Props) {
       <label className="ctl">
         <span className="lbl">Style</span>
         <select value={chart.style} onChange={(e) => props.onStyle(e.target.value as Style)}>
-          {(['jazz', 'rock', 'bossa'] as Style[]).map((s) => (
-            <option key={s} value={s}>{STYLE_LABEL[s]}</option>
+          {groupedStyles().map(({ group, styles }) => (
+            <optgroup key={group} label={group}>
+              {styles.map((s) => (
+                <option key={s.id} value={s.id}>{s.label}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </label>
@@ -102,16 +107,47 @@ export function Header(props: Props) {
           <>
             <div className="backdrop" onClick={() => setMenu(null)} />
             <div className="dropdown">
+              <button onClick={() => { props.onOpenCharts(); setMenu(null); }}>My charts…</button>
+              <button onClick={() => { props.onOpenStandards(); setMenu(null); }}>Core 100 standards…</button>
+              <button onClick={() => { props.onExportMidi(); setMenu(null); }}>Export MIDI…</button>
               <button onClick={() => { props.actions.resetFour(); setMenu(null); }}>Reset to 4 bars</button>
               <button onClick={() => { props.actions.newChart(); setMenu(null); }}>New chart</button>
               <button onClick={() => { props.actions.loadAutumnLeaves(); setMenu(null); }}>Load Autumn Leaves</button>
               <button onClick={() => { props.actions.loadBlueBossa(); setMenu(null); }}>Load Blue Bossa</button>
+              <button onClick={() => { props.actions.loadCantaloupeIsland(); setMenu(null); }}>Load Cantaloupe Island</button>
+              <button onClick={() => { props.actions.loadMrPC(); setMenu(null); }}>Load Mr. P.C.</button>
+              <button onClick={() => { props.actions.loadMisty(); setMenu(null); }}>Load Misty</button>
               <button onClick={() => { props.actions.clear(); setMenu(null); }}>Clear chords</button>
               <button onClick={() => { props.actions.fit(); setMenu(null); }}>Fit / Comfortable</button>
             </div>
           </>
         )}
       </div>
+
+      <button className="ctl btn stdbtn newbtn" onClick={() => props.actions.newChart()} title="New chart" aria-label="New chart">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+          <path d="M4 1.8h5l3 3v9.4H4z" />
+          <path d="M9 1.8v3h3" />
+          <path d="M8 7.9v3.4M6.3 9.6h3.4" />
+        </svg>
+        <span className="stdbtn-label">New</span>
+      </button>
+
+      <button className="ctl btn stdbtn" onClick={props.onOpenCharts} title="My charts">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+          <path d="M1.8 4.2h4.1l1.2 1.4h7.1v7.6H1.8z" />
+          <path d="M1.8 7h12.4" opacity=".6" />
+        </svg>
+        <span className="stdbtn-label">Charts</span>
+      </button>
+
+      <button className="ctl btn stdbtn" onClick={props.onOpenStandards} title="Core 100 standards">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
+          <path d="M2.5 2.5h4.2c.9 0 1.3.4 1.3 1.2v9.8c0-.8-.4-1.2-1.3-1.2H2.5z" />
+          <path d="M13.5 2.5H9.3c-.9 0-1.3.4-1.3 1.2v9.8c0-.8.4-1.2 1.3-1.2h4.2z" />
+        </svg>
+        <span className="stdbtn-label">Standards</span>
+      </button>
 
       <button className="btn-print" onClick={props.onPrint}>
         <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3">
@@ -146,8 +182,8 @@ export function Header(props: Props) {
                 ))}
               </div>
               <div className="steppers">
-                <label>A <button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', from: Math.max(1, props.loop.from - 1) })}>−</button><b>{props.loop.from}</b><button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', from: Math.min(32, props.loop.from + 1) })}>+</button></label>
-                <label>B <button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', to: Math.max(1, props.loop.to - 1) })}>−</button><b>{props.loop.to}</b><button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', to: Math.min(32, props.loop.to + 1) })}>+</button></label>
+                <label>A <button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', from: Math.max(1, props.loop.from - 1) })}>−</button><b>{props.loop.from}</b><button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', from: Math.min(64, props.loop.from + 1) })}>+</button></label>
+                <label>B <button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', to: Math.max(1, props.loop.to - 1) })}>−</button><b>{props.loop.to}</b><button onClick={() => props.onLoopChange({ ...props.loop, mode: 'range', to: Math.min(64, props.loop.to + 1) })}>+</button></label>
               </div>
             </div>
           </>

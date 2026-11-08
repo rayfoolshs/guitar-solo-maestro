@@ -110,7 +110,7 @@ describe('arrangement', () => {
     expect(s!.beat).toBeCloseTo(1 + 2 / 3, 3);
   });
 
-  it('voices each chord with its own root and chord tones (root double-count regression)', () => {
+  it('voices each chord with guide tones and leaves the root to the bass', () => {
     const events = buildScore({ ...chart, visibleBars: 4 }, key, { style: 'jazz', swing: 0.5 });
     // bar 3 is Fm7 — the first version added the root twice and played D♭/F instead of A♭/E♭
     const bar3 = events.filter((e) => Math.floor(e.beat / bpb) === 2);
@@ -118,7 +118,10 @@ describe('arrangement', () => {
     const bass = bar3.filter((e) => e.channel === 'bass' && e.beat % bpb < 0.1)[0];
 
     expect(mod12(bass.midi)).toBe(5); // F
-    for (const pc of [5, 8, 0, 3]) expect(pianoPcs.has(pc)).toBe(true); // F A♭ C E♭
+    // Rootless voicing: third and seventh are present, the root is left to the bass.
+    expect(pianoPcs.has(8)).toBe(true); // A♭
+    expect(pianoPcs.has(3)).toBe(true); // E♭
+    expect(pianoPcs.has(5)).toBe(false);
   });
 
   it('plays a 3-2 son clave on the bossa cross-stick', () => {

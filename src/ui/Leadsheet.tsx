@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Chart } from '../chart/model';
 import { autoName, beatsPerBar, prettyChord } from '../chart/model';
+import { styleLabel } from '../arrange/styles';
 import type { KeyInfo } from '../theory/keys';
 import { mod12 } from '../theory/pitch';
 import type { Candidate } from '../theory/suggest';
@@ -46,7 +47,7 @@ export function Leadsheet(props: Props) {
   const { chart, keyInfo, view, selection, playing, playBar, suggestions, transitions, onSelect, onCommit, onBarCount, onToggleView, global } = props;
   const bpb = beatsPerBar(chart);
   const sig = keySignature(keyInfo);
-  const styleLabel = chart.style === 'jazz' ? 'Jazz Swing' : chart.style === 'rock' ? 'Rock' : 'Bossa Nova';
+  const styleLabelText = styleLabel(chart.style);
 
   const [edit, setEdit] = useState<{ bar: number; beat: number; value: string } | null>(null);
   const [drag, setDrag] = useState<{ a: number; b: number } | null>(null);
@@ -302,7 +303,7 @@ export function Leadsheet(props: Props) {
     <section className="card leadsheet">
       <div className="print-head">
         <h2>{chart.name || autoName(chart)}</h2>
-        <span>{keyInfo.name} · {chart.tempo} bpm · {styleLabel} · {chart.visibleBars} bars</span>
+        <span>{chart.composer ? `${chart.composer}${chart.year ? ` · ${chart.year}` : ''} · ` : ''}{keyInfo.name} · {chart.tempo} bpm · {styleLabelText} · {chart.visibleBars} bars</span>
       </div>
 
       <div className="cardhead screen-only">
@@ -315,7 +316,7 @@ export function Leadsheet(props: Props) {
         <div className="stepper">
           <button onClick={() => onBarCount(chart.visibleBars - 1)} disabled={chart.visibleBars <= 4} aria-label="Fewer bars">−</button>
           <span>{chart.visibleBars} bars</span>
-          <button onClick={() => onBarCount(chart.visibleBars + 1)} disabled={chart.visibleBars >= 32} aria-label="More bars">+</button>
+          <button onClick={() => onBarCount(chart.visibleBars + 1)} disabled={chart.visibleBars >= 64} aria-label="More bars">+</button>
         </div>
         <button className="chip btn" onClick={onToggleView}>{view === 'fit' ? 'Fit' : 'Comfort'}</button>
       </div>
