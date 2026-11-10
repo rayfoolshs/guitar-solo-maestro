@@ -64,6 +64,22 @@ Keyboard: **Space** toggles play/stop, **L** toggles the loop.
 tones are sand and tensions are dashed. Toggle **Degrees / Notes** and **Tensions**, and
 choose a position window from **All** (1–5 … 17–24).
 
+### Keyboard view
+
+Toggle **Keyboard** in the board header to see the same scale on a piano instead of the
+neck. Three octaves of the scale are written on a grand stave — bass clef for the lower
+notes, treble clef from middle C up — with the right-hand fingering below, and three
+octaves of keyboard show the tonic in amber, chord tones in teal and the other scale tones
+in sand. The **Degrees / Notes** and **Tensions** toggles work the same way.
+
+### MIDI input
+
+The keyboard view also accepts a hardware MIDI keyboard. Turn on **MIDI** in the MIDI bar,
+pick the device, then choose **Piano**, **Organ**, **Flute** or **Saxophone** (piano is the
+default). The notes play through the same General MIDI soundfont as the transport, and the
+keyboard lights up the keys you are holding. Web MIDI needs a browser that supports it and
+a secure context (localhost or HTTPS).
+
 ### Why lane
 
 Select a chord to see the chosen scale, its degrees, its parent scale and why it fits.

@@ -360,6 +360,75 @@ main > .board { grid-column: 1 / -1; }
 .legend .sw.scale { background: #f1ead9; border: 1px solid #dcd3bf; }
 .legend .sw.tension { background: transparent; border: 1.2px dashed #bdb4a0; }
 
+/* ---------------- keyboard view ---------------- */
+.kswitch {
+  display: inline-flex; align-items: center; gap: 7px; height: 24px;
+  padding: 0 9px 0 5px; border-radius: 6px;
+  border: 1px solid var(--line); background: #fff;
+  font-size: 10px; color: var(--ink2);
+}
+.kswitch .track {
+  position: relative; width: 26px; height: 14px; border-radius: 999px;
+  background: #ddd5c4; transition: background 0.15s ease;
+}
+.kswitch .track i {
+  position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28); transition: transform 0.15s ease;
+}
+.kswitch:hover { border-color: var(--line2); background: #fbf8f0; }
+.kswitch.on { border-color: var(--ink); color: var(--ink); font-weight: 600; }
+.kswitch.on .track { background: var(--teal); }
+.kswitch.on .track i { transform: translateX(12px); }
+
+.kbwrap { display: flex; flex-direction: column; gap: 6px; }
+.kbempty { padding: 26px 4px; font-size: 10.5px; color: var(--muted); }
+.kbstrip { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.kbstrip .lab { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: #a79e8c; font-weight: 800; margin-right: 2px; }
+.kbnote {
+  display: flex; align-items: center; gap: 5px; height: 22px;
+  padding: 0 8px 0 4px; border: 1px solid var(--line); border-radius: 6px; background: #fff;
+  font-size: 10px;
+}
+.kbnote .fin {
+  display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%;
+  background: var(--ink); color: #f6f2e8; font-size: 9px; font-weight: 700;
+}
+.kbnote b { font-weight: 650; }
+.kbnote em { font-style: normal; font-size: 9px; color: var(--muted); }
+.kbrange { font-size: 9.5px; color: var(--muted); font-family: ui-monospace, monospace; }
+
+/* ---------------- MIDI input ---------------- */
+.midibar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-bottom: 2px; padding: 6px 8px; border: 1px solid var(--line);
+  border-radius: 8px; background: #fbf8f0;
+}
+.midi-toggle {
+  display: inline-flex; align-items: center; gap: 7px; height: 24px;
+  padding: 0 9px 0 5px; border-radius: 6px;
+  border: 1px solid var(--line); background: #fff;
+  font-size: 10px; color: var(--ink2);
+}
+.midi-toggle .track {
+  position: relative; width: 26px; height: 14px; border-radius: 999px;
+  background: #ddd5c4; transition: background 0.15s ease;
+}
+.midi-toggle .track i {
+  position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28); transition: transform 0.15s ease;
+}
+.midi-toggle:hover { border-color: var(--line2); background: #fbf8f0; }
+.midi-toggle.on { border-color: var(--ink); color: var(--ink); font-weight: 600; }
+.midi-toggle.on .track { background: var(--teal); }
+.midi-toggle.on .track i { transform: translateX(12px); }
+.midi-select {
+  height: 24px; padding: 0 6px; border: 1px solid var(--line); border-radius: 6px;
+  background: #fff; font-size: 10px; color: var(--ink); max-width: 190px;
+}
+.midi-select:disabled { color: var(--muted); background: #f4f1e8; }
+.midi-status { font-size: 9.5px; color: var(--muted); }
+.midi-status.warn { color: #b45309; }
+
 /* ---------------- print ---------------- */
 /* Printing reproduces the leadsheet as it appears on screen, scaled to A4 landscape. */
 .print-head { display: none; }

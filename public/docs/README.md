@@ -5,6 +5,7 @@ Version **0.9.0** · 2026-11-08
 | Document | What it covers |
 |---|---|
 | [User guide](./USER-GUIDE.md) | Every control, playback styles, libraries, MIDI export |
+| [Visual theme](./THEME.md) | Palette, type, notation artwork, colour semantics, print rules |
 | [Architecture](./ARCHITECTURE.md) | Module map, data flow, theory and arrangement engines |
 | [Core 100 standards](./STANDARDS.md) | The bundled library: data shape, styles, verification, full list |
 | [Chart format](./CHART-FORMAT.md) | JSON schema, validation rules, storage keys, compact changes syntax |

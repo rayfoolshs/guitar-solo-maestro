@@ -40,6 +40,11 @@ export class AudioEngine {
   private running = false;
   private volumes: Record<ChannelId, number> = { piano: -6, bass: -9, drums: -8 };
   private mutes: Record<ChannelId, boolean> = { piano: false, bass: false, drums: false };
+  /** Start time of each held live note, for a minimum audible length. */
+  private liveOn = new Map<number, number>();
+  /** Last program and volume sent to the live channel, so we don't re-send them per note. */
+  private liveProgram = -1;
+  private liveVolume = -1;
 
   get playing() { return this.running; }
 
@@ -55,7 +60,9 @@ export class AudioEngine {
       return this.ctx;
     }
     const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new Ctor();
+    // Ask the browser for the smallest workable buffer. This is the main lever
+    // for live-playing latency; the browser may still choose a larger buffer.
+    const ctx = new Ctor({ latencyHint: 'interactive' });
     this.ctx = ctx;
     this.master = ctx.createGain();
     this.master.gain.value = 0.9;
@@ -89,6 +96,52 @@ export class AudioEngine {
 
   setMaster(db: number) {
     if (this.master) this.master.gain.value = dbToGain(db);
+  }
+
+  /**
+   * Live MIDI note: plays on the dedicated live channel so it never collides
+   * with the arrangement. Falls back to the built-in piano voice when the
+   * soundfont is not loaded yet.
+   */
+  playNoteOn(midi: number, velocity: number, program: number) {
+    const ctx = this.ensure();
+    const sf = getSoundfont();
+    this.liveOn.set(midi, ctx.currentTime);
+    if (sf) {
+      // Only re-send the program/volume when they actually change. Sending
+      // them on every note adds work to the audio thread and can make the
+      // first note after a patch change feel late.
+      if (this.liveProgram !== program) {
+        sf.programChange(MIDI_CHANNEL.live, program);
+        this.liveProgram = program;
+      }
+      if (this.liveVolume !== -6) {
+        sf.controllerChange(MIDI_CHANNEL.live, 7, dbToCC7(-6));
+        this.liveVolume = -6;
+      }
+      // time: 0 means "play now". Passing an absolute AudioContext time here
+      // can make the worklet queue the note until its clock catches up, which
+      // is the usual source of live-input latency.
+      sf.noteOn(MIDI_CHANNEL.live, midi, Math.max(1, Math.min(127, Math.round(velocity))), { time: 0 });
+      return;
+    }
+    this.note('piano', midi, ctx.currentTime, 0.5, velocity);
+  }
+
+  /**
+   * Release a live MIDI note. Very short taps (a click on an on-screen key)
+   * still get a minimum length so they are audible.
+   */
+  noteOff(midi: number) {
+    const sf = getSoundfont();
+    const started = this.liveOn.get(midi);
+    this.liveOn.delete(midi);
+    if (!sf) return;
+    const now = this.ctx?.currentTime ?? 0;
+    // A tap shorter than 90 ms would be inaudible, so keep it sounding. Held
+    // notes release immediately (time 0 = "now").
+    const time = started !== undefined && now - started < 0.09 ? started + 0.09 : 0;
+    sf.noteOff(MIDI_CHANNEL.live, midi, { time });
   }
 
   play(events: NoteEvent[], opts: PlayOptions) {

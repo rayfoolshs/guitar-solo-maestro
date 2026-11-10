@@ -3,6 +3,27 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
+## Unreleased · Keyboard view and live MIDI input
+
+- **Keyboard view** — toggle **Keyboard** in the board header to see the suggested scale
+  on a piano instead of the neck. Three octaves are written on a grand stave (bass clef
+  below middle C, treble clef above) with right-hand fingering; three octaves of keyboard
+  show the tonic, chord tones and other scale tones. The **Degrees / Notes** and
+  **Tensions** toggles work the same way.
+- **Engraved grand stave** — clefs, brace and accidentals are Bravura SMuFL glyphs rather
+  than hand-drawn shapes, stems follow each stave's middle line, and ledger lines appear
+  only where a note actually needs one.
+- **Live MIDI input** — the keyboard view accepts a hardware MIDI keyboard. Enable
+  **MIDI**, choose the device, and play **Piano**, **Organ**, **Flute** or **Saxophone**
+  (piano is the default). Notes play through the General MIDI soundfont on a dedicated
+  live channel, and the keys light up while they are held.
+- `src/theory/keyboard.ts` handles scale spelling, textbook right-hand fingerings and
+  keyboard geometry; `src/audio/midiInput.ts` handles Web MIDI parsing and device
+  selection.
+- `docs/THEME.md` documents the visual language: palette, type, notation artwork and the
+  colour semantics shared by the neck, keyboard and stave.
+- Tests: 99 total, adding keyboard spelling, fingering, layout and MIDI parsing.
+
 ## 0.9.0 — 2026-11-08 · Transpose charts
 
 - **Transpose control in the mixer** — step the whole chart up or down a semitone; the

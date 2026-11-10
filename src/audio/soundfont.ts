@@ -16,7 +16,7 @@ const BANK_URL = new URL('soundfonts/GeneralUser-GS.sf2', document.baseURI).href
 let synth: WorkletSynthesizer | null = null;
 let loading: Promise<WorkletSynthesizer | null> | null = null;
 
-export const MIDI_CHANNEL = { piano: 0, bass: 1, drums: 9 } as const;
+export const MIDI_CHANNEL = { piano: 0, bass: 1, drums: 9, live: 2 } as const;
 
 /** dB (−60…+6) → MIDI CC7 (0…127), using the usual concave volume curve. */
 export function dbToCC7(db: number): number {

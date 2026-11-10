@@ -21,6 +21,7 @@ src/
     keys.ts       key signature helpers, detection
     suggest.ts    chord-scale ranking and transitions
     fretboard.ts  pitch-class -> fretboard positions, nearestMidi
+    keyboard.ts   scale spelling, right-hand fingering, keyboard geometry
 
   chart/        the document model
     model.ts      Chart / Bar / ChordSlot, presets, edit helpers
@@ -36,10 +37,11 @@ src/
   audio/        playback
     soundfont.ts  GM channel map, program changes, soundfont loading
     engine.ts     lookahead scheduler over Web Audio
+    midiInput.ts  Web MIDI device access, note parsing, instrument list
 
   ui/           React components
-    Header.tsx, Leadsheet.tsx, Mixer.tsx, Fretboard.tsx,
-    StandardsModal.tsx, ChartsModal.tsx, VersionModal.tsx
+    Header.tsx, Leadsheet.tsx, Mixer.tsx, Fretboard.tsx, Keyboard.tsx,
+    MidiBar.tsx, StandardsModal.tsx, ChartsModal.tsx, VersionModal.tsx
 
   App.tsx       state wiring between the model, UI and audio
   version.ts    version + release history

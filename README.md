@@ -4,7 +4,7 @@ A practice companion for guitarists who want to solo over chord changes. You giv
 tune; it tells you **which scale to play over every chord** and shows you **where those
 notes sit on the neck** — then plays the progression back so you can practise against it.
 
-**v0.4.2** · [Play it live](https://rayfoolshs.github.io/guitar-solo-maestro/) · made by
+**v0.9.0** · [Play it live](https://rayfoolshs.github.io/guitar-solo-maestro/) · made by
 Ray Foo · [www.rayfooproductions.com](https://www.rayfooproductions.com)
 
 ![Guitar Solo Maestro](guitar-solo-maestro-screen.jpg)
@@ -57,6 +57,14 @@ position — low E on the bottom row up to high E on top. Tonic ringed in amber,
 teal, other scale tones sand, tensions dashed. Degree or note labels, and eight position
 windows (All, 1–5 … 17–24).
 
+**See it on the keyboard**
+
+Toggle **Keyboard** to swap the fretboard for a piano view: three octaves of the suggested
+scale on a grand stave (bass and treble clefs) with right-hand fingering, plus three octaves
+of keyboard with the scale, chord tones and tonic highlighted. Connect a MIDI keyboard and
+pick **Piano**, **Organ**, **Flute** or **Saxophone** (defaults to piano); the keys light up
+as you play.
+
 **Play it**
 
 A General MIDI soundfont (GeneralUser GS, through Spessasynth's WASM synth) renders piano
@@ -67,7 +75,8 @@ roots with chromatic approaches, and drums in six feels:
 six-hit ride for jazz. Swing is adjustable for the two jazz feels; the shuffle is a fixed
 12/8 feel. Switching style, swing, key or tempo while playing re-arranges from the next
 bar. There is also a 0–100 % swing slider, tempo, count-in, loop, and a compact mixer with
-per-part volume, mutes and a piano octave shifter.
+per-part volume, mutes and a piano octave shifter. The keyboard view also plays a live
+MIDI keyboard through the same soundfont, with a piano/organ/flute/saxophone choice.
 
 **Print it**
 
@@ -80,7 +89,7 @@ system, scale lane under each.
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # typecheck + production bundle in dist/
-npm test         # theory / arrangement / style / standards / io / midi / transpose tests (78)
+npm test         # theory / arrangement / style / standards / io / midi / keyboard / transpose tests (99)
 ```
 
 ## How it's built
@@ -92,11 +101,11 @@ a public repo on every push.
 
 ```
 src/
-  theory/     pitch, chords, scales, keys, chord-scale ranking, fretboard mapping
+  theory/     pitch, chords, scales, keys, chord-scale ranking, fretboard and keyboard mapping
   chart/      the document: Chart / Bar / ChordSlot, Core 100 standards, JSON io, saved-chart library
   arrange/    style descriptors, chart + style -> note events (comping, bass, drums, swing)
-  audio/      lookahead scheduler, built-in synth, Spessasynth soundfont
-  ui/         Header, Leadsheet, Mixer, Fretboard, StandardsModal, ChartsModal, VersionModal
+  audio/      lookahead scheduler, built-in synth, Spessasynth soundfont, Web MIDI input
+  ui/         Header, Leadsheet, Mixer, Fretboard, Keyboard, MidiBar, StandardsModal, ChartsModal, VersionModal
   version.ts  version + release history (drives the in-app modal)
 tests/        theory + arrangement tests
 ```
@@ -109,7 +118,7 @@ items in [`BUILD_PLAN.md`](BUILD_PLAN.md).
 
 ## Docs
 
-- [`docs/`](docs/README.md) — user guide, architecture, Core 100, chart format, MIDI export
+- [`docs/`](docs/README.md) — user guide, visual theme, architecture, Core 100, chart format, MIDI export
 - [`BUILD_PLAN.md`](BUILD_PLAN.md) — architecture, theory engine, arrangement, roadmap
 - [`CHANGELOG.md`](CHANGELOG.md) — version history
 - [`UPDATES.md`](UPDATES.md) — upcoming milestones
