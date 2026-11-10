@@ -38,6 +38,7 @@ src/
     soundfont.ts  GM channel map, program changes, soundfont loading
     engine.ts     lookahead scheduler over Web Audio
     midiInput.ts  Web MIDI device access, note parsing, instrument list
+    computerKeys.ts  A–K fallback mapping when Web MIDI is unavailable
 
   ui/           React components
     Header.tsx, Leadsheet.tsx, Mixer.tsx, Fretboard.tsx, Keyboard.tsx,
@@ -60,7 +61,7 @@ localStorage (working chart)
         └──────────────► suggestForChord(chord, key) ──► Candidate[]
                                       │
                                       ▼
-                             Leadsheet / Fretboard / Why lane
+                             Leadsheet / Fretboard / Keyboard / analysis line
 
 Chart + KeyInfo + Style ──► buildScore() ──► NoteEvent[]
                                                     │
@@ -70,8 +71,9 @@ Chart + KeyInfo + Style ──► buildScore() ──► NoteEvent[]
 
 1. `App` holds the working `Chart`.
 2. `parseSlots(chart)` flattens visible bars into ordered chord slots.
-3. `detectKey(slots)` ranks all 24 keys and returns a key plus confidence; a manual key
-   override bypasses detection.
+3. `detectKey(slots)` ranks all 24 keys and returns a key plus confidence. Picking a key in
+   the header transposes the chart into it and stores it as `keyManual`; **auto** clears the
+   manual key and falls back to detection again.
 4. For each chord, `suggestForChord` ranks scales by chord-tone coverage, key membership,
    family fit and transition distance.
 5. `buildScore` turns the chart into timed notes for piano, bass and drums.
@@ -110,6 +112,12 @@ while preserving the quality suffix; it ignores `6/9` when looking for a slash b
 the cumulative offset in `chart.transpose`. Spelling comes from the destination key via
 `preferFlatsFor`, so repeated transposition stays readable. Because the symbols themselves
 are rewritten, analysis, playback and exports follow with no extra code.
+
+`transposeToKey(chart, tonic, mode)` is what the header's key selector calls. It measures
+the interval from the key currently in force to the chosen key, takes the shortest signed
+path (−6…+6), spells for the destination, and pins that key as `keyManual`. Choosing the key
+that is already active only pins it; **auto** sets `keyManual` back to `null` without moving
+the chords.
 
 ## Arrangement engine
 

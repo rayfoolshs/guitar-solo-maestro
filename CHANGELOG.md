@@ -3,6 +3,18 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
+## 0.11.0 — 2026-11-10 · Key transposition and analysis line
+
+- **Key selector transposes the chart** — picking one of the 24 keys in the header now moves
+  every chord by the shortest interval into that key and pins it. Choosing **auto** returns
+  to key detection without moving the chords again.
+- **Analysis line moved** — the bar, chord, scale, parent mode and borrowed-note line now
+  sits inside the Leadsheet card directly under its heading, above the chart, instead of in
+  its own card below.
+- `transposeToKey()` in `src/chart/model.ts` chooses the destination spelling and keeps the
+  cumulative transposition offset correct; covered in `tests/transpose.test.ts`.
+- Tests: 103 total.
+
 ## 0.10.0 — 2026-11-10 · Keyboard view and live MIDI input
 
 - **Keyboard view** — toggle **Keyboard** in the board header to see the suggested scale

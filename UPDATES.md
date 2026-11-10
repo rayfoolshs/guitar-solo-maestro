@@ -5,7 +5,7 @@ milestones. Released history lives in [`CHANGELOG.md`](./CHANGELOG.md); this fil
 tracks what is coming next so each milestone can be copied into the changelog and
 `src/version.ts` when it ships.
 
-- **Current release:** `0.10.0` (2026-11-10)
+- **Current release:** `0.11.0` (2026-11-10)
 - **Drafted:** 2026-11-08
 - **Versioning:** pre-1.0, one minor bump per feature set; patches for fixes.
 
@@ -19,6 +19,7 @@ tracks what is coming next so each milestone can be copied into the changelog an
 | `0.8.0` | MIDI export | **Shipped 2026-11-08** |
 | `0.9.0` | Transpose charts | **Shipped 2026-11-08** |
 | `0.10.0` | Keyboard view and live MIDI input | **Shipped 2026-11-10** |
+| `0.11.0` | Key transposition and analysis line | **Shipped 2026-11-10** |
 
 ---
 
@@ -325,6 +326,23 @@ the app plays, including swing, for use in a DAW or another practice tool.
 
 **Verification:** `npm test` (99 tests), `npm run build`, and a browser pass over the
 keyboard view, the grand stave at several zoom levels, and the held-note highlight.
+
+---
+
+## 0.11.0 — Key transposition and analysis line (shipped 2026-11-10)
+
+**Status:** shipped in `0.11.0` (2026-11-10) — see `CHANGELOG.md`.
+
+- Choosing one of the 24 keys in the header transposes every chord into that key by the
+  shortest interval, spells for the destination, and pins the key. **auto** clears the
+  manual key without moving the chords.
+- `transposeToKey()` shares the chord-rewriting helper with `transposeChart()` and keeps the
+  cumulative offset correct.
+- The analysis line (bar, chord, scale, parent mode, borrowed notes) moved inside the
+  Leadsheet card, directly under its heading and above the chart.
+
+**Verification:** `npm test` (103 tests), `npm run build`, and a browser pass from G minor
+(auto) to C minor and back, checking chord symbols, the mixer offset and the analysis text.
 
 ---
 

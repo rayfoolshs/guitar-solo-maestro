@@ -148,7 +148,6 @@ main {
 }
 main > .mixer { grid-column: 1; grid-row: 1; }
 main > .leadsheet { grid-column: 2; grid-row: 1; }
-main > .whylane,
 main > .board { grid-column: 1 / -1; }
 .card {
   background: var(--card);
@@ -324,7 +323,10 @@ main > .board { grid-column: 1 / -1; }
 /* ---------------- why line ---------------- */
 .whylane {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  height: 36px; padding: 0 14px; font-size: 11px; color: var(--ink2);
+  margin: 10px 0 0; padding: 7px 12px;
+  border: 1px solid var(--line); border-radius: 8px;
+  background: #fbf8f0;
+  font-size: 10.5px; color: var(--ink2);
 }
 .whylane .k { font-size: 8.5px; letter-spacing: 0.11em; text-transform: uppercase; color: #a2906b; font-weight: 800; }
 .whylane b { color: var(--ink); }

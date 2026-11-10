@@ -1,6 +1,6 @@
 # Guitar Solo Maestro — Visual Theme
 
-Version **0.10.0** · 2026-11-10
+Version **0.11.0** · 2026-11-10
 
 The rules behind how the app looks: the palette, the type, the notation artwork and the
 small set of semantics that decide which note is which colour. Everything here is taken
@@ -197,7 +197,7 @@ ink marks, no gradients.
 The leadsheet is a first-class output, not a screenshot:
 
 - A4 landscape, 10 mm margins, white background.
-- Header, mixer, analysis lane, board, steppers and chips are hidden.
+- Header, mixer, analysis line, board, steppers and chips are hidden.
 - A print-only title block names the tune, key, tempo and style.
 - Colours are forced with `print-color-adjust: exact`, so chord tints and scale lanes
   survive printing.

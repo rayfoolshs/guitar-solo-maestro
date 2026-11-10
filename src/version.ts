@@ -1,4 +1,4 @@
-export const VERSION = '0.10.0';
+export const VERSION = '0.11.0';
 export const BUILD_DATE = '2026-11-10';
 
 export interface Release {
@@ -10,6 +10,16 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.11.0',
+    date: '2026-11-10',
+    title: 'Key transposition and analysis line',
+    items: [
+      'Picking a key in the header now transposes every chord into that key by the shortest interval.',
+      'Auto clears the manual key and returns to detection without moving the chords again.',
+      'The analysis line now sits inside the Leadsheet card, directly under its heading and above the chart.',
+    ],
+  },
   {
     version: '0.10.0',
     date: '2026-11-10',

@@ -24,7 +24,7 @@ install.
 
 | Control | What it does |
 |---|---|
-| **Key** | Auto-detected key, or pick one of the 24 keys to override it |
+| **Key** | Auto-detected key, or pick one of the 24 keys to transpose the chart into it |
 | **Tempo** | 40–220 bpm; changing it while playing applies from the next bar |
 | **Style** | Six playback feels (see below) |
 | **New** | Start a blank 4-bar leadsheet (confirms if the chart has chords) |
@@ -54,7 +54,8 @@ Keyboard: **Space** toggles play/stop, **L** toggles the loop.
 - **Style** selector.
 - **Piano / Bass / Drums** volume sliders and mute buttons.
 - **Transpose** — `−` / `+` move the whole chart a semitone; click the number to reset to
-  the original key.
+  the original key. Choosing a key in the header does the same thing in one step, so the
+  offset also reflects a key change.
 - **Oct** shifts the piano voicing −2…+2 octaves.
 - **Swing** 0–100 % for the jazz feels (the shuffle is a fixed 12/8 feel).
 
@@ -80,9 +81,11 @@ default). The notes play through the same General MIDI soundfont as the transpor
 keyboard lights up the keys you are holding. Web MIDI needs a browser that supports it and
 a secure context (localhost or HTTPS).
 
-### Why lane
+### Analysis line
 
-Select a chord to see the chosen scale, its degrees, its parent scale and why it fits.
+Select a chord to see the chosen scale, its degrees, its parent scale and why it fits. The
+line sits directly under the **Leadsheet** heading, above the chart, and updates as you
+click beats. It is hidden when you print.
 
 ## Playback styles
 

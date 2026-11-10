@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { transposeChordSymbol } from '../src/theory/chords';
-import { blueBossa, transposeChart } from '../src/chart/model';
+import { blueBossa, transposeChart, transposeToKey } from '../src/chart/model';
 
 describe('transposeChordSymbol', () => {
   it('moves roots and preserves the quality suffix', () => {
@@ -36,8 +36,7 @@ describe('transposeChordSymbol', () => {
   });
 });
 
-describe('transposeChart', () => {
-  it('moves every chord and tracks the offset', () => {
+describe('transposeChart', () => {  it('moves every chord and tracks the offset', () => {
     const up = transposeChart(blueBossa(), 2);
     expect(up.bars[0].slots[0].input).toBe('Dm7');
     expect(up.bars[2].slots[0].input).toBe('Gm7');
@@ -69,5 +68,34 @@ describe('transposeChart', () => {
     expect(transposeChart(blueBossa(), 6).transpose).toBe(6);
     expect(transposeChart(blueBossa(), 7).transpose).toBe(-5);
     expect(transposeChart(blueBossa(), 12).transpose).toBe(0);
+  });
+});
+
+describe('transposeToKey', () => {
+  it('moves the chart into the chosen key by the shortest interval', () => {
+    const g = transposeToKey(blueBossa(), 7, 'minor');
+    expect(g.keyManual).toEqual({ tonic: 7, mode: 'minor' });
+    expect(g.bars[0].slots[0].input).toBe('Gm7');
+    expect(g.transpose).toBe(-5);
+  });
+
+  it('pins the key without moving the chords when it is already in force', () => {
+    const same = transposeToKey(blueBossa(), 0, 'minor');
+    expect(same.bars[0].slots[0].input).toBe('Cm7');
+    expect(same.keyManual).toEqual({ tonic: 0, mode: 'minor' });
+    expect(same.transpose ?? 0).toBe(0);
+  });
+
+  it('spells for the chosen key and mode', () => {
+    const eflat = transposeToKey(blueBossa(), 3, 'major');
+    expect(eflat.bars[0].slots[0].input).toBe('E♭m7');
+    expect(eflat.keyManual).toEqual({ tonic: 3, mode: 'major' });
+  });
+
+  it('keeps the cumulative offset correct after earlier transposes', () => {
+    const up = transposeChart(blueBossa(), 2);
+    const back = transposeToKey(up, 0, 'minor');
+    expect(back.bars[0].slots[0].input).toBe('Cm7');
+    expect(back.transpose).toBe(0);
   });
 });

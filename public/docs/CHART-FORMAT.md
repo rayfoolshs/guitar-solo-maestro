@@ -91,6 +91,16 @@ files and older exports still load.
 }
 ```
 
+## Keys and transposition
+
+`keyManual` holds a key the player pinned from the header selector; `null` means the key is
+detected from the chords. Choosing a key rewrites every chord symbol into it by the shortest
+interval and sets `keyManual`; **auto** sets it back to `null` without moving the chords.
+
+`transpose` is the cumulative offset applied to the symbols, wrapped to the shortest
+interval. Both the mixer stepper and the key selector add to it, so a chart moved C → G → A
+stores the offset relative to the symbols as written, and clicking the offset resets it.
+
 ## Chord symbols
 
 `parseChord` understands:

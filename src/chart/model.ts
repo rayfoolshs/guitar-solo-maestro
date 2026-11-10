@@ -243,16 +243,41 @@ export function transposeChart(chart: Chart, semitones: number): Chart {
   const keyManual = chart.keyManual
     ? { ...chart.keyManual, tonic: mod12(chart.keyManual.tonic + semitones) }
     : null;
-  const bars = chart.bars.map((bar) => ({
+  return {
+    ...chart,
+    bars: transposeSlots(chart.bars, semitones, flats),
+    keyManual,
+    transpose: wrapTranspose((chart.transpose ?? 0) + semitones),
+  };
+}
+
+/** Rewrite chord symbols in place, spelling for the destination key. */
+function transposeSlots(bars: Bar[], semitones: number, flats: boolean): Bar[] {
+  return bars.map((bar) => ({
     ...bar,
     slots: bar.slots.map((slot) => ({
       ...slot,
       input: transposeChordSymbol(slot.input, semitones, flats),
     })),
   }));
+}
+
+/**
+ * Move the whole chart into a chosen key: transpose by the shortest interval
+ * from the key currently in force, spell for the destination key, and make that
+ * key manual. Choosing the key already in force just pins it.
+ */
+export function transposeToKey(chart: Chart, tonic: number, mode: Mode): Chart {
+  const currentKey = chart.keyManual
+    ? makeKey(chart.keyManual.tonic, chart.keyManual.mode)
+    : detectKey(parseSlots(chart)).key;
+  const delta = mod12(tonic - currentKey.tonic);
+  const semitones = delta > 6 ? delta - 12 : delta;
+  const keyManual = { tonic: mod12(tonic), mode };
+  if (!semitones) return { ...chart, keyManual };
   return {
     ...chart,
-    bars,
+    bars: transposeSlots(chart.bars, semitones, preferFlatsFor(tonic, mode)),
     keyManual,
     transpose: wrapTranspose((chart.transpose ?? 0) + semitones),
   };

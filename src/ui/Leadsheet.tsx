@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Chart } from '../chart/model';
+import type { Chart, SlotRef } from '../chart/model';
 import { autoName, beatsPerBar, prettyChord } from '../chart/model';
 import { styleLabel } from '../arrange/styles';
 import type { KeyInfo } from '../theory/keys';
@@ -35,6 +35,7 @@ interface Props {
   onToggleView: () => void;
   global: Candidate[];
   selectedCandidate: Candidate | null;
+  selectedSlot: SlotRef | null;
   loop: { mode: 'off' | 'visible' | 'range'; from: number; to: number };
   loopRange: { from: number; to: number };
   onLoopRange: (fromBar: number, toBar: number) => void;
@@ -45,6 +46,7 @@ const gutterFor = (accidentals: number) => 64 + accidentals * 12;
 
 export function Leadsheet(props: Props) {
   const { chart, keyInfo, view, selection, playing, playBar, suggestions, transitions, onSelect, onCommit, onBarCount, onToggleView, global } = props;
+  const { selectedCandidate, selectedSlot } = props;
   const bpb = beatsPerBar(chart);
   const sig = keySignature(keyInfo);
   const styleLabelText = styleLabel(chart.style);
@@ -319,6 +321,26 @@ export function Leadsheet(props: Props) {
           <button onClick={() => onBarCount(chart.visibleBars + 1)} disabled={chart.visibleBars >= 64} aria-label="More bars">+</button>
         </div>
         <button className="chip btn" onClick={onToggleView}>{view === 'fit' ? 'Fit' : 'Comfort'}</button>
+      </div>
+
+      <div className="whylane">
+        {selectedSlot?.chord && selectedCandidate ? (
+          <>
+            <span className="k">Bar {selectedSlot.barIndex + 1} · beat {selectedSlot.beat + 1}</span>
+            <b>{prettyChord(selectedSlot.input)}</b>
+            <span className="sep">·</span>
+            <b className="amber">{selectedCandidate.name}</b>
+            <span className="mono">{selectedCandidate.degrees}</span>
+            <span className="sep">·</span>
+            <span>{selectedCandidate.parent ?? 'derived scale'}</span>
+            <span className="sep">·</span>
+            <span className={selectedCandidate.added.length ? 'warn' : 'ok'}>
+              {selectedCandidate.reason}
+            </span>
+          </>
+        ) : (
+          <span className="muted">Select a chord to see why the scale fits.</span>
+        )}
       </div>
 
       <div className={`chart screen-chart ${view}${drag ? ' dragging' : ''}`}>

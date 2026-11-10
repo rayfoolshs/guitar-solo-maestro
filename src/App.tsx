@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   blueBossa, autumnLeaves, cantaloupeIsland, mrPC, misty, makeEmptyChart, parseSlots,
-  setChord, setVisibleBars, slotRefs, autoName, beatsPerBar, prettyChord, transposeChart,
-  type Chart, type Style,
+  setChord, setVisibleBars, slotRefs, autoName, beatsPerBar, transposeChart,
+  transposeToKey, type Chart, type Style,
 } from './chart/model';
 import { detectKey, makeKey, type KeyInfo } from './theory/keys';
 import { suggestForChord, suggestGlobal, transitionScore, type Candidate } from './theory/suggest';
@@ -260,9 +260,14 @@ export default function App() {
         onLoopChange={setLoop}
         onTempo={(tempo) => setChart((c) => ({ ...c, tempo }))}
         onStyle={(style: Style) => setChart((c) => ({ ...c, style }))}
-        onKeyChange={(name) => {
-          const [tonic, mode] = name.split('|');
-          setChart((c) => ({ ...c, keyManual: { tonic: Number(tonic), mode: mode as 'major' | 'minor' } }));
+        onKeyChange={(value) => {
+          setStatus(null);
+          if (!value) {
+            setChart((c) => ({ ...c, keyManual: null }));
+            return;
+          }
+          const [tonic, mode] = value.split('|');
+          setChart((c) => transposeToKey(c, Number(tonic), mode as 'major' | 'minor'));
         }}
         onPrint={() => window.print()}
         onOpenStandards={() => setStandardsOpen(true)}
@@ -300,6 +305,7 @@ export default function App() {
           onToggleView={chartActions.fit}
           global={global}
           selectedCandidate={selectedCandidate}
+          selectedSlot={selectedSlot ?? null}
           loop={loop}
           loopRange={range}
           onLoopRange={(fromBar, toBar) =>
@@ -329,26 +335,6 @@ export default function App() {
           loop={loop}
           bank={bank}
         />
-
-        <section className="card whylane">
-          {selectedChord && selectedCandidate ? (
-            <>
-              <span className="k">Bar {selectedSlot!.barIndex + 1} · beat {selectedSlot!.beat + 1}</span>
-              <b>{prettyChord(selectedChord.input)}</b>
-              <span className="sep">·</span>
-              <b className="amber">{selectedCandidate.name}</b>
-              <span className="mono">{selectedCandidate.degrees}</span>
-              <span className="sep">·</span>
-              <span>{selectedCandidate.parent ?? 'derived scale'}</span>
-              <span className="sep">·</span>
-              <span className={selectedCandidate.added.length ? 'warn' : 'ok'}>
-                {selectedCandidate.reason}
-              </span>
-            </>
-          ) : (
-            <span className="muted">Select a chord to see why the scale fits.</span>
-          )}
-        </section>
 
         <Fretboard
           candidate={selectedCandidate}

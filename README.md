@@ -28,7 +28,8 @@ Bars go from 4 to 64; the stepper hides and reveals them without destroying anyt
 opens on **Blue Bossa** in C minor — two choruses, three flats on the stave. The `Chart ▾`
 menu also loads **Autumn Leaves**, **Cantaloupe Island**, **Mr. P.C.** and **Misty**, and the
 **Standards** button opens a bundled **Core 100** library with search and style/tag filters.
-Transpose the whole chart from the mixer in semitone steps; click the offset to reset.
+Transpose the whole chart from the mixer in semitone steps, or pick a key from the header to
+move it into that key; click the mixer offset to reset.
 
 **Save and load**
 
@@ -45,7 +46,10 @@ notation app.
 
 **Read the analysis**
 
-- Key detection across all 24 keys, with a confidence score and an overridable key.
+- Key detection across all 24 keys, with a confidence score and a key selector that
+  transposes the whole chart into the key you pick.
+- The bar you select is explained in a line under the Leadsheet heading: the chord, its
+  scale, the mode it comes from and the notes it borrows.
 - A scale per chord, ranked by fit, with borrowed-note flags and transition arrows showing
   how far each scale is from its neighbour.
 - One whole-progression recommendation, plus pentatonic and blues alternatives.
@@ -89,7 +93,7 @@ system, scale lane under each.
 npm install
 npm run dev      # http://localhost:5173
 npm run build    # typecheck + production bundle in dist/
-npm test         # theory / arrangement / style / standards / io / midi / keyboard / transpose tests (99)
+npm test         # theory / arrangement / style / standards / io / midi / keyboard / transpose tests (103)
 ```
 
 ## How it's built
