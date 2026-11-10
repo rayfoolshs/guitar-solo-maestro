@@ -5,7 +5,7 @@ milestones. Released history lives in [`CHANGELOG.md`](./CHANGELOG.md); this fil
 tracks what is coming next so each milestone can be copied into the changelog and
 `src/version.ts` when it ships.
 
-- **Current release:** `0.4.2` (2026-11-03)
+- **Current release:** `0.10.0` (2026-11-10)
 - **Drafted:** 2026-11-08
 - **Versioning:** pre-1.0, one minor bump per feature set; patches for fixes.
 
@@ -18,6 +18,7 @@ tracks what is coming next so each milestone can be copied into the changelog an
 | `0.7.0` | Chart library and chart management | **Shipped 2026-11-08** |
 | `0.8.0` | MIDI export | **Shipped 2026-11-08** |
 | `0.9.0` | Transpose charts | **Shipped 2026-11-08** |
+| `0.10.0` | Keyboard view and live MIDI input | **Shipped 2026-11-10** |
 
 ---
 
@@ -302,6 +303,28 @@ the app plays, including swing, for use in a DAW or another practice tool.
 
 **Verification:** `npm test` (78 tests), `npm run build`, and a browser pass over
 +1, two separate −1 steps (sharp then flat spelling), reset, and transposing while playing.
+
+---
+
+## 0.10.0 — Keyboard view and live MIDI input (shipped 2026-11-10)
+
+**Status:** shipped in `0.10.0` (2026-11-10) — see `CHANGELOG.md`.
+
+- **Keyboard** toggle in the board header swaps the fretboard for a piano view: three
+  octaves of keyboard plus three octaves of the suggested scale written on a grand stave
+  (bass clef below middle C, treble clef above) with right-hand fingering.
+- Clefs, brace and accidentals use Bravura SMuFL glyphs; stems follow each stave's middle
+  line and ledger lines are drawn only where a note needs one.
+- **MIDI** input plays Piano, Organ, Flute or Saxophone (piano default) on a dedicated live
+  channel; held notes turn red on both the keyboard and the stave. A–K and clicking a key
+  cover environments where Web MIDI is blocked.
+- `src/theory/keyboard.ts` (spelling, fingering, geometry), `src/audio/midiInput.ts`
+  (device list, parsing), `src/audio/computerKeys.ts` (fallback mapping).
+- `docs/THEME.md` records the palette, type and colour semantics used across the neck,
+  keyboard and stave.
+
+**Verification:** `npm test` (99 tests), `npm run build`, and a browser pass over the
+keyboard view, the grand stave at several zoom levels, and the held-note highlight.
 
 ---
 

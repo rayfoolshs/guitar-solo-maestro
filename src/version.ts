@@ -1,5 +1,5 @@
-export const VERSION = '0.9.0';
-export const BUILD_DATE = '2026-11-08';
+export const VERSION = '0.10.0';
+export const BUILD_DATE = '2026-11-10';
 
 export interface Release {
   version: string;
@@ -10,6 +10,19 @@ export interface Release {
 
 /** Pre-release milestones. Newest first. */
 export const HISTORY: Release[] = [
+  {
+    version: '0.10.0',
+    date: '2026-11-10',
+    title: 'Keyboard view and live MIDI input',
+    items: [
+      'Toggle Keyboard in the board header to see the suggested scale on a piano instead of the neck.',
+      'Three octaves are written on a grand stave — bass clef below middle C, treble clef above — with right-hand fingering.',
+      'Clefs, brace and accidentals are Bravura SMuFL glyphs; stems and ledger lines follow the stave.',
+      'Three octaves of keyboard show the tonic in amber, chord tones in teal and other scale tones in sand.',
+      'Live MIDI input plays Piano, Organ, Flute or Saxophone (piano default); the keys and stave light up red while held.',
+      'A–K on the computer keyboard and clicking a key work when Web MIDI is unavailable.',
+    ],
+  },
   {
     version: '0.9.0',
     date: '2026-11-08',

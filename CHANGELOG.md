@@ -3,7 +3,7 @@
 All notable changes to Guitar Solo Maestro. Pre-release milestones while the app is
 being built; newest first.
 
-## Unreleased · Keyboard view and live MIDI input
+## 0.10.0 — 2026-11-10 · Keyboard view and live MIDI input
 
 - **Keyboard view** — toggle **Keyboard** in the board header to see the suggested scale
   on a piano instead of the neck. Three octaves are written on a grand stave (bass clef

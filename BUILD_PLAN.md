@@ -36,6 +36,7 @@ src/
     keys.ts         diatonic sets, key ranking, mode-on-degree
     suggest.ts      chord-scale ranking, global suggestion, transition cost
     fretboard.ts    tuning, geometry, degree labels
+    keyboard.ts     scale spelling on a stave, right-hand fingering, piano geometry
   chart/       the document
     model.ts        Chart / Bar / ChordSlot, Blue Bossa default, editing helpers
   arrange/     chart + style → note events
@@ -43,8 +44,10 @@ src/
   audio/       sound out
     engine.ts       lookahead scheduler + built-in synth fallback
     soundfont.ts    Spessasynth worklet, bank loading, CC7 volume
+    midiInput.ts    Web MIDI device list and note parsing
+    computerKeys.ts A–K fallback when Web MIDI is unavailable
   ui/          React
-    Header, Leadsheet, Mixer, Fretboard, VersionModal
+    Header, Leadsheet, Mixer, Fretboard, Keyboard, MidiBar, VersionModal
   version.ts   version + release history (drives the in-app modal)
 ```
 

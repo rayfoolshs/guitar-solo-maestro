@@ -1,6 +1,6 @@
 # Guitar Solo Maestro — Documentation
 
-Version **0.9.0** · 2026-11-08
+Version **0.10.0** · 2026-11-10
 
 | Document | What it covers |
 |---|---|
